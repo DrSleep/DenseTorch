@@ -34,6 +34,10 @@ As my everyday research is concerned with dense per-pixel tasks, I found myself 
 This library is still work-in-progress. More examples and more models will be added.
 Contributions are welcome.
 
+## Documentation
+
+Is available [here](https://drsleep.github.io/DenseTorch/).
+
 ## Citation
 
 If you found this library useful in your research, please consider citing
