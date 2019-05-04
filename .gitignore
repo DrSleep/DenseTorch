@@ -16,5 +16,4 @@ logs/
 *.png
 *.jpg
 
-docs/build/
 .eggs/
