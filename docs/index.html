@@ -1,0 +1,913 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DenseTorch: PyTorch Wrapper for Smooth Workflow with Dense Per-Pixel Tasks &mdash; DenseTorch  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> DenseTorch
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">DenseTorch: PyTorch Wrapper for Smooth Workflow with Dense Per-Pixel Tasks</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#motivation-behind-the-library">Motivation behind the library</a></li>
+<li><a class="reference internal" href="#future-work">Future Work</a></li>
+<li><a class="reference internal" href="#citation">Citation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multi-task-training-example">Multi-Task Training Example</a><ul>
+<li><a class="reference internal" href="#prepare-data">Prepare Data</a></li>
+<li><a class="reference internal" href="#training">Training</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#single-task-training-example">Single-Task Training Example</a><ul>
+<li><a class="reference internal" href="#id1">Prepare Data</a></li>
+<li><a class="reference internal" href="#id3">Training</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#code-documentation">Code Documentation</a><ul>
+<li><a class="reference internal" href="#densetorch-nn">densetorch.nn</a></li>
+<li><a class="reference internal" href="#densetorch-engine">densetorch.engine</a></li>
+<li><a class="reference internal" href="#densetorch-data">densetorch.data</a></li>
+<li><a class="reference internal" href="#densetorch-misc">densetorch.misc</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">DenseTorch</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>DenseTorch: PyTorch Wrapper for Smooth Workflow with Dense Per-Pixel Tasks</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/drsleep/densetorch" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="densetorch-pytorch-wrapper-for-smooth-workflow-with-dense-per-pixel-tasks">
+<h1>DenseTorch: PyTorch Wrapper for Smooth Workflow with Dense Per-Pixel Tasks<a class="headerlink" href="#densetorch-pytorch-wrapper-for-smooth-workflow-with-dense-per-pixel-tasks" title="Permalink to this headline">¶</a></h1>
+<p>This library aims to ease typical workflows involving dense per-pixel tasks in PyTorch. The progress in such tasks as semantic image segmentation and depth estimation have been significant over the last years, and in this library we provide an easy-to-setup environment for experimenting with given (or your own) models that reliably solve these tasks.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Python &gt;= 3.6.7 is supported.</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/drsleep/densetorch.git
+cd densetorch
+pip install -e .
+</pre></div>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Currently, we provide several models for single-task and multi-task setups.
+Concretely, the following networks are currently provided:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mobilenet-v2</span></code> MobileNet-v2.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xception-65</span></code> Xception-65.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">deeplab-v3+</span></code> DeepLab-v3+.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lwrf</span></code> Light-Weight RefineNet.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mtlwrf</span></code> Multi-Task Light-Weight RefineNet.</p></li>
+</ul>
+<p>Examples are given in the <code class="docutils literal notranslate"><span class="pre">examples/</span></code> directory. Note that the provided examples do not necessarily reproduce the results achieved in corresponding papers, rather their goal is to demonstrate what can be done using this library.</p>
+</div>
+<div class="section" id="motivation-behind-the-library">
+<h2>Motivation behind the library<a class="headerlink" href="#motivation-behind-the-library" title="Permalink to this headline">¶</a></h2>
+<p>As my everyday research is concerned with dense per-pixel tasks, I found myself oftentimes re-writing and updating (occassionally improving upon) my own code for each project. With the number of projects being on the rise recently, such an approach was no longer easy to manage. Hence, I decided to create a simple to use and simple to extend upon backbone (pun is not intended) structure, which I would be able to share with the community and, hopefully, ease the experience for others in the field.</p>
+</div>
+<div class="section" id="future-work">
+<h2>Future Work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h2>
+<p>This library is still work-in-progress. More examples and more models will be added.
+Contributions are welcome.</p>
+</div>
+<div class="section" id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
+<p>If you found this library useful in your research, please consider citing</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>@misc{Nekrasov19,
+  author = {Nekrasov, Vladimir},
+  title = {DenseTorch},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/drsleep/densetorch}}
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="multi-task-training-example">
+<h1>Multi-Task Training Example<a class="headerlink" href="#multi-task-training-example" title="Permalink to this headline">¶</a></h1>
+<p>In this example, we are going to train Multi-Task Light-Weight RefineNet for joint semantic segmentation and depth estimation. Note that inference examples together with pre-trained weights can be found in the official <a class="reference external" href="https://github.com/DrSleep/multi-task-refinenet">repository</a>.</p>
+<p>The hyperparameters set here are not the same as used in the corresponding paper, hence the results will differ. Please refer to the paper below for more information on the
+model and the training regime.</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>Real-Time Joint Semantic Segmentation and Depth Estimation Using Asymmetric Annotations
+Vladimir Nekrasov, Thanuja Dharmasiri, Andrew Spek, Tom Drummond, Chunhua Shen, Ian Reid
+In ICRA 2019
+</pre></div>
+</div>
+<div class="section" id="prepare-data">
+<h2>Prepare Data<a class="headerlink" href="#prepare-data" title="Permalink to this headline">¶</a></h2>
+<p>Considering that you successfully installed the <code class="docutils literal notranslate"><span class="pre">DenseTorch</span></code> package, the next step is to download the NYUDv2 dataset with segmentation and depth masks. The dataset can be downloaded by following the <a class="reference external" href="https://cloudstor.aarnet.edu.au/plus/s/pQY2sgg4fffGUYy">link</a>.</p>
+<p>After downloading and unpacking the archive, create the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> folder and link the <code class="docutils literal notranslate"><span class="pre">nyudv2</span></code> directory in the archive
+to the just created folder:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>mkdir datasets
+ln -s /path/to/nyudv2 ./datasets/
+</pre></div>
+</div>
+</div>
+<div class="section" id="training">
+<h2>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
+<p>Now you are ready to run the example script. To do so, simply execute <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">train.py</span></code>. After it is finished, the
+best model will be stored in the corresponding <code class="docutils literal notranslate"><span class="pre">pth.tar</span></code> file. Note that it would the model that improves upon the
+previous checkpoint both in terms of mean IoU (for segmentation) and linear RMSE (for depth estimation).</p>
+</div>
+</div>
+<div class="section" id="single-task-training-example">
+<h1>Single-Task Training Example<a class="headerlink" href="#single-task-training-example" title="Permalink to this headline">¶</a></h1>
+<p>In this example, we are going to train DeepLab-v3+ with the MobileNet-v2 backbone for the task of semantic segmentation on NYUDv2.</p>
+<div class="section" id="id1">
+<h2>Prepare Data<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Considering that you successfully installed the <code class="docutils literal notranslate"><span class="pre">DenseTorch</span></code> package, the next step is to download the NYUDv2 dataset with segmentation and depth masks. The dataset can be downloaded by following the <a class="reference external" href="https://cloudstor.aarnet.edu.au/plus/s/pQY2sgg4fffGUYy">link</a>.</p>
+<p>After downloading and unpacking the archive, create the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> folder and link the <code class="docutils literal notranslate"><span class="pre">nyudv2</span></code> directory in the archive
+to the just created folder:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>mkdir datasets
+ln -s /path/to/nyudv2 ./datasets/
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>Training<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>Now you are ready to run the example script. To do so, simply execute <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">train.py</span></code>. After it is finished, the
+best model will be stored in the corresponding <code class="docutils literal notranslate"><span class="pre">pth.tar</span></code> file.</p>
+</div>
+</div>
+<div class="section" id="code-documentation">
+<h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="densetorch-nn">
+<h2>densetorch.nn<a class="headerlink" href="#densetorch-nn" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>nn</cite> module implements a range of well-established encoders and decoders.</p>
+<span class="target" id="module-densetorch.nn.decoders"></span><dl class="class">
+<dt id="densetorch.nn.decoders.DLv3plus">
+<em class="property">class </em><code class="descclassname">densetorch.nn.decoders.</code><code class="descname">DLv3plus</code><span class="sig-paren">(</span><em>input_sizes</em>, <em>num_classes</em>, <em>skip_size=48</em>, <em>agg_size=256</em>, <em>rates=(6</em>, <em>12</em>, <em>18)</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.DLv3plus" title="Permalink to this definition">¶</a></dt>
+<dd><p>DeepLab-v3+ for Semantic Image Segmentation.</p>
+<p>ASPP with decoder. Allows to have multiple skip-connections.
+More information about the model: <a class="reference external" href="https://arxiv.org/abs/1802.02611">https://arxiv.org/abs/1802.02611</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_sizes</strong> (<em>int</em><em>, or </em><em>list</em>) – number of channels for each input.
+Last value represents the input to ASPP,
+other values are for skip-connections.</p></li>
+<li><p><strong>num_classes</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>skip_size</strong> (<em>int</em>) – common filter size for skip-connections.</p></li>
+<li><p><strong>agg_size</strong> (<em>int</em>) – common filter size.</p></li>
+<li><p><strong>rates</strong> (<em>list of ints</em>) – dilation rates in the ASPP module.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.nn.decoders.DLv3plus.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>xs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.DLv3plus.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.nn.decoders.LWRefineNet">
+<em class="property">class </em><code class="descclassname">densetorch.nn.decoders.</code><code class="descname">LWRefineNet</code><span class="sig-paren">(</span><em>input_sizes</em>, <em>collapse_ind</em>, <em>num_classes</em>, <em>agg_size=256</em>, <em>n_crp=4</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.LWRefineNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light-Weight RefineNet for Semantic Image Segmentation.</p>
+<p>More information about the model: <a class="reference external" href="https://arxiv.org/abs/1810.03272">https://arxiv.org/abs/1810.03272</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_sizes</strong> (<em>int</em><em>, or </em><em>list</em>) – number of channels for each input.</p></li>
+<li><p><strong>collapse_ind</strong> (<em>list</em>) – which input layers should be united together
+(via element-wise summation) before CRP.</p></li>
+<li><p><strong>num_classes</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>agg_size</strong> (<em>int</em>) – common filter size.</p></li>
+<li><p><strong>n_crp</strong> (<em>int</em>) – number of CRP layers in a single CRP block.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.nn.decoders.LWRefineNet.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>xs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.LWRefineNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="densetorch.nn.decoders.LWRefineNet.make_crp">
+<em class="property">static </em><code class="descname">make_crp</code><span class="sig-paren">(</span><em>in_planes</em>, <em>out_planes</em>, <em>stages</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.LWRefineNet.make_crp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creating Light-Weight Chained Residual Pooling (CRP) block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_planes</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_planes</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>stages</strong> (<em>int</em>) – number of times the design is repeated
+(with new weights)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>nn.Sequential</cite> of CRP layers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.nn.decoders.MTLWRefineNet">
+<em class="property">class </em><code class="descclassname">densetorch.nn.decoders.</code><code class="descname">MTLWRefineNet</code><span class="sig-paren">(</span><em>input_sizes</em>, <em>collapse_ind</em>, <em>num_classes</em>, <em>agg_size=256</em>, <em>n_crp=4</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.MTLWRefineNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multi-Task Light-Weight RefineNet for Dense per-pixel tasks.</p>
+<p>More information about the model: <a class="reference external" href="https://arxiv.org/abs/1809.04766">https://arxiv.org/abs/1809.04766</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_sizes</strong> (<em>int</em><em>, or </em><em>list</em>) – number of channels for each input.</p></li>
+<li><p><strong>collapse_ind</strong> (<em>list</em>) – which input layers should be united together
+(via element-wise summation) before CRP.</p></li>
+<li><p><strong>num_classes</strong> (<em>int</em><em> or </em><em>list</em>) – number of output channels per each head.</p></li>
+<li><p><strong>agg_size</strong> (<em>int</em>) – common filter size.</p></li>
+<li><p><strong>n_crp</strong> (<em>int</em>) – number of CRP layers in a single CRP block.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.nn.decoders.MTLWRefineNet.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>xs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.decoders.MTLWRefineNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-densetorch.nn.mobilenetv2"></span><dl class="function">
+<dt id="densetorch.nn.mobilenetv2.mobilenetv2">
+<code class="descclassname">densetorch.nn.mobilenetv2.</code><code class="descname">mobilenetv2</code><span class="sig-paren">(</span><em>pretrained=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.mobilenetv2.mobilenetv2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the mobilenet-v2 network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – whether to load pre-trained weights.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>nn.Module</cite> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-densetorch.nn.xception"></span><dl class="function">
+<dt id="densetorch.nn.xception.xception65">
+<code class="descclassname">densetorch.nn.xception.</code><code class="descname">xception65</code><span class="sig-paren">(</span><em>pretrained=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.xception.xception65" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the Xception-65 network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – whether to load pre-trained weights.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>nn.Module</cite> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="densetorch-engine">
+<h2>densetorch.engine<a class="headerlink" href="#densetorch-engine" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>engine</cite> module contains metrics and losses typically used for tasks of semantic segmenation and depth estimation.
+Also contains training and validation functions.</p>
+<span class="target" id="module-densetorch.engine.losses"></span><dl class="class">
+<dt id="densetorch.engine.losses.InvHuberLoss">
+<em class="property">class </em><code class="descclassname">densetorch.engine.losses.</code><code class="descname">InvHuberLoss</code><span class="sig-paren">(</span><em>ignore_index=0</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.losses.InvHuberLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse Huber Loss for depth estimation.</p>
+<p>The setup is taken from <a class="reference external" href="https://arxiv.org/abs/1606.00373">https://arxiv.org/abs/1606.00373</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ignore_index</strong> (<em>float</em>) – value to ignore in the target
+when computing the loss.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.engine.losses.InvHuberLoss.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.losses.InvHuberLoss.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-densetorch.engine.metrics"></span><dl class="class">
+<dt id="densetorch.engine.metrics.MeanIoU">
+<em class="property">class </em><code class="descclassname">densetorch.engine.metrics.</code><code class="descname">MeanIoU</code><span class="sig-paren">(</span><em>num_classes</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.metrics.MeanIoU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean-IoU computational block for semantic segmentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_classes</strong> (<em>int</em>) – number of classes to evaluate.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="densetorch.engine.metrics.MeanIoU.name">
+<code class="descname">name</code><a class="headerlink" href="#densetorch.engine.metrics.MeanIoU.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>descriptor of the estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.engine.metrics.RMSE">
+<em class="property">class </em><code class="descclassname">densetorch.engine.metrics.</code><code class="descname">RMSE</code><span class="sig-paren">(</span><em>ignore_val=0</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.metrics.RMSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root Mean Squared Error computational block for depth estimation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ignore_val</strong> (<em>float</em>) – value to ignore in the target
+when computing the metric.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="densetorch.engine.metrics.RMSE.name">
+<code class="descname">name</code><a class="headerlink" href="#densetorch.engine.metrics.RMSE.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>descriptor of the estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-densetorch.engine.trainval"></span><dl class="function">
+<dt id="densetorch.engine.trainval.train">
+<code class="descclassname">densetorch.engine.trainval.</code><code class="descname">train</code><span class="sig-paren">(</span><em>model</em>, <em>opts</em>, <em>crits</em>, <em>dataloader</em>, <em>loss_coeffs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.trainval.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full Training Pipeline.</p>
+<p>Supports multiple optimisers, multiple criteria,     multiple losses, multiple outputs.
+Assumes that the model.eval() property has been set up properly before the     function call, that the dataloader outputs have the correct type, that      the model outputs do not require any post-processing bar the upsampling      to the target size.
+Criteria, loss_coeff, and model’s outputs all must have the same length,     and correspond to the same keys as in the ordered dict of dataloader’s     sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – PyTorch model object.</p></li>
+<li><p><strong>opts</strong> – list of optimisers.</p></li>
+<li><p><strong>crits</strong> – list of criterions.</p></li>
+<li><p><strong>dataloader</strong> – iterable over samples.
+Each sample must contain <cite>image</cite> key and
+&gt;= 1 optional keys.</p></li>
+<li><p><strong>loss_coeffs</strong> – list of coefficients for each loss term.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.engine.trainval.trainbal">
+<code class="descclassname">densetorch.engine.trainval.</code><code class="descname">trainbal</code><span class="sig-paren">(</span><em>model</em>, <em>dataloader</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.trainval.trainbal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full Training Pipeline with balanced model.</p>
+<p>Assumes that the model.eval() property has been set up properly     before the function call, that the dataloader outputs have the correct type,    that the model outputs do not require any post-processing bar     the upsampling to the target size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – PyTorch model object.</p></li>
+<li><p><strong>dataloader</strong> – iterable over samples.
+Each sample must contain <cite>image</cite> key and
+&gt;= 1 optional keys.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.engine.trainval.validate">
+<code class="descclassname">densetorch.engine.trainval.</code><code class="descname">validate</code><span class="sig-paren">(</span><em>model</em>, <em>metrics</em>, <em>dataloader</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.engine.trainval.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full Validation Pipeline.</p>
+<p>Support multiple metrics (but 1 per modality), multiple outputs.
+Assumes that the dataloader outputs have the correct type, that the model     outputs do not require any post-processing bar the upsampling     to the target size.
+Metrics and model’s outputs must have the same length, and correspond to     the same keys as in the ordered dict of dataloader’s sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – PyTorch model object.</p></li>
+<li><p><strong>metrics</strong> – list of metric classes. Each metric class must have update
+and val functions, and must have ‘name’ attribute.</p></li>
+<li><p><strong>dataloader</strong> – iterable over samples.
+Each sample must contain <cite>image</cite> key and
+&gt;= 1 optional keys.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="densetorch-data">
+<h2>densetorch.data<a class="headerlink" href="#densetorch-data" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>data</cite> module implements datasets and relevant utilities used for data pre-processing. It supports multi-modal data.</p>
+<span class="target" id="module-densetorch.data.datasets"></span><dl class="class">
+<dt id="densetorch.data.datasets.MMDataset">
+<em class="property">class </em><code class="descclassname">densetorch.data.datasets.</code><code class="descname">MMDataset</code><span class="sig-paren">(</span><em>data_file</em>, <em>data_dir</em>, <em>line_to_paths_fn</em>, <em>masks_names</em>, <em>transform_trn=None</em>, <em>transform_val=None</em>, <em>stage='train'</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.datasets.MMDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multi-Modality dataset.</p>
+<p>Works with any datasets that contain image
+and any number of 2D-annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_file</strong> (<em>string</em>) – Path to the data file with annotations.</p></li>
+<li><p><strong>data_dir</strong> (<em>string</em>) – Directory with all the images.</p></li>
+<li><p><strong>line_to_paths_fn</strong> (<em>callable</em>) – function to convert a line of data_file
+into paths (img_relpath, msk_relpath, …).</p></li>
+<li><p><strong>masks_names</strong> (<em>list of strings</em>) – keys for each annotation mask
+(e.g., ‘segm’, ‘depth’).</p></li>
+<li><p><strong>transform_trn</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional transform
+to be applied on a sample during the training stage.</p></li>
+<li><p><strong>transform_val</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional transform
+to be applied on a sample during the validation stage.</p></li>
+<li><p><strong>stage</strong> (<em>str</em>) – initial stage of dataset - either ‘train’ or ‘val’.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="staticmethod">
+<dt id="densetorch.data.datasets.MMDataset.read_image">
+<em class="property">static </em><code class="descname">read_image</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.datasets.MMDataset.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple image reader</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>str</em>) – path to image.</p>
+</dd>
+</dl>
+<p>Returns image as <cite>np.array</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="densetorch.data.datasets.MMDataset.set_stage">
+<code class="descname">set_stage</code><span class="sig-paren">(</span><em>stage</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.datasets.MMDataset.set_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define which set of transformation to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – either ‘train’ or ‘val’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-densetorch.data.utils"></span><dl class="class">
+<dt id="densetorch.data.utils.Normalise">
+<em class="property">class </em><code class="descclassname">densetorch.data.utils.</code><code class="descname">Normalise</code><span class="sig-paren">(</span><em>scale</em>, <em>mean</em>, <em>std</em>, <em>depth_scale=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.utils.Normalise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalise a tensor image with mean and standard deviation.
+Given mean: (R, G, B) and std: (R, G, B),
+will normalise each channel of the torch.*Tensor, i.e.
+channel = (scale * channel - mean) / std</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scale</strong> (<em>float</em>) – Scaling constant.</p></li>
+<li><p><strong>mean</strong> (<em>sequence</em>) – Sequence of means for R,G,B channels respecitvely.</p></li>
+<li><p><strong>std</strong> (<em>sequence</em>) – Sequence of standard deviations for R,G,B channels
+respecitvely.</p></li>
+<li><p><strong>depth_scale</strong> (<em>float</em>) – Depth divisor for depth annotations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.data.utils.Pad">
+<em class="property">class </em><code class="descclassname">densetorch.data.utils.</code><code class="descname">Pad</code><span class="sig-paren">(</span><em>size</em>, <em>img_val</em>, <em>msk_vals</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.utils.Pad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pad image and mask to the desired size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<em>int</em>) – minimum length/width.</p></li>
+<li><p><strong>img_val</strong> (<em>array</em>) – image padding value.</p></li>
+<li><p><strong>msk_vals</strong> (<em>list of ints</em>) – masks padding value.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.data.utils.RandomCrop">
+<em class="property">class </em><code class="descclassname">densetorch.data.utils.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>crop_size</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.utils.RandomCrop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crop randomly the image in a sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>crop_size</strong> (<em>int</em>) – Desired output size.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.data.utils.RandomMirror">
+<em class="property">class </em><code class="descclassname">densetorch.data.utils.</code><code class="descname">RandomMirror</code><a class="headerlink" href="#densetorch.data.utils.RandomMirror" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly flip the image and the mask</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.data.utils.ResizeAndScale">
+<em class="property">class </em><code class="descclassname">densetorch.data.utils.</code><code class="descname">ResizeAndScale</code><span class="sig-paren">(</span><em>side</em>, <em>low_scale</em>, <em>high_scale</em>, <em>shorter=True</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.data.utils.ResizeAndScale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resize shorter/longer side to a given value and randomly scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>side</strong> (<em>int</em>) – shorter / longer side value.</p></li>
+<li><p><strong>low_scale</strong> (<em>float</em>) – lower scaling bound.</p></li>
+<li><p><strong>high_scale</strong> (<em>float</em>) – upper scaling bound.</p></li>
+<li><p><strong>shorter</strong> (<em>bool</em>) – whether to resize shorter / longer side.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.data.utils.ToTensor">
+<em class="property">class </em><code class="descclassname">densetorch.data.utils.</code><code class="descname">ToTensor</code><a class="headerlink" href="#densetorch.data.utils.ToTensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert ndarrays in sample to Tensors.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="densetorch-misc">
+<h2>densetorch.misc<a class="headerlink" href="#densetorch-misc" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>misc</cite> module has various useful utilities.</p>
+<span class="target" id="module-densetorch.misc.utils"></span><dl class="class">
+<dt id="densetorch.misc.utils.AverageMeter">
+<em class="property">class </em><code class="descclassname">densetorch.misc.utils.</code><code class="descname">AverageMeter</code><span class="sig-paren">(</span><em>momentum=0.99</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.AverageMeter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple running average estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>momentum</strong> (<em>float</em>) – running average decay.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.misc.utils.AverageMeter.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.AverageMeter.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update running average given a new value.</p>
+<p>The new running average estimate is given as a weighted combination         of the previous estimate and the current value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<em>float</em>) – new value</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.misc.utils.Balancer">
+<em class="property">class </em><code class="descclassname">densetorch.misc.utils.</code><code class="descname">Balancer</code><span class="sig-paren">(</span><em>model</em>, <em>opts</em>, <em>crits</em>, <em>loss_coeffs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.Balancer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for balanced multi-GPU training.</p>
+<p>When forward and backward passes are fused into a single nn.Module object,     the multi-GPU consumption is distributed more equally across the GPUs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – PyTorch module.</p></li>
+<li><p><strong>opts</strong> (<em>list</em><em> or </em><em>single instance of torch.optim</em>) – optimisers.</p></li>
+<li><p><strong>crits</strong> (<em>list</em><em> or </em><em>single instance of torch.nn</em><em> or </em><em>nn.Module</em>) – criterions.</p></li>
+<li><p><strong>loss_coeffs</strong> (<em>list of single instance of float</em>) – loss coefficients.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.misc.utils.Balancer.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>targets=None</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.Balancer.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward and (optionally) backward pass.</p>
+<p>When targets are provided, the backward pass is performed.
+Otherwise only the forward pass is done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp</strong> (<em>torch.tensor</em>) – input batch.</p></li>
+<li><p><strong>targets</strong> (<em>None</em><em> or </em><em>torch.tensor</em>) – targets batch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Forward output if <cite>targets=None</cite>, else returns the loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="densetorch.misc.utils.Saver">
+<em class="property">class </em><code class="descclassname">densetorch.misc.utils.</code><code class="descname">Saver</code><span class="sig-paren">(</span><em>init_vals</em>, <em>comp_fns</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saver class for monitoring the training progress.</p>
+<p>Given initial values and comparison functions, Saver keeps track of newly     added values and updates them in case all of the new values satisfy the     corresponding comparison functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>init_vals</strong> (<em>list</em>) – initial values. Represent lower bounds for performance
+of each task.</p></li>
+<li><p><strong>comp_fns</strong> (<em>list</em>) – list of comparison functions.
+Each function takes two inputs and produces
+one boolean output.
+Each newly provided value
+will be compared against the initial value using
+the corresponding comparison function.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="densetorch.misc.utils.Saver.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>new_vals</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.Saver.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saving criterion.</p>
+<p>Checks whether the saving criterion is trigerred. The saving occurs         when all newly added values satisfy their corresponding comparison         functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>new_vals</strong> (<em>list</em>) – new values for comparison.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>True</cite> if all comparison functions return <cite>True</cite>.
+Otherwise, returns <cite>False</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.misc.utils.compute_params">
+<code class="descclassname">densetorch.misc.utils.</code><code class="descname">compute_params</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.compute_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the total number of parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>nn.Module</em>) – PyTorch model.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Total number of parameters - both trainable and non-trainable (int).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.misc.utils.create_optim">
+<code class="descclassname">densetorch.misc.utils.</code><code class="descname">create_optim</code><span class="sig-paren">(</span><em>enc</em>, <em>parameters</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.create_optim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise optimisers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enc</strong> (<em>string</em>) – type of optimiser - either ‘SGD’ or ‘Adam’.</p></li>
+<li><p><strong>parameters</strong> (<em>iterable</em>) – parameters to be optimised.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of torch.optim.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError if enc is not either of 'SGD'</strong><strong> or </strong><strong>'Adam'.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.misc.utils.ctime">
+<code class="descclassname">densetorch.misc.utils.</code><code class="descname">ctime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.ctime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns current timestamp in the format of hours-minutes-seconds.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.misc.utils.get_args">
+<code class="descclassname">densetorch.misc.utils.</code><code class="descname">get_args</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.get_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get function’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>callable</em>) – input function.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of positional and keyword arguments.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.misc.utils.make_list">
+<code class="descclassname">densetorch.misc.utils.</code><code class="descname">make_list</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.make_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the given input as a list.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.misc.utils.set_seed">
+<code class="descclassname">densetorch.misc.utils.</code><code class="descname">set_seed</code><span class="sig-paren">(</span><em>seed</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.misc.utils.set_seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setting the random seed across <cite>torch</cite>, <cite>numpy</cite> and <cite>random</cite> libraries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>int</em>) – random seed value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Vladimir Nekrasov
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
