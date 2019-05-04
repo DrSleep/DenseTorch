@@ -17,3 +17,4 @@ logs/
 *.jpg
 
 .eggs/
+olddocs/
