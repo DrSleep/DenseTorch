@@ -1,6 +1,6 @@
 # Single-Task Training Example
 
-In this example, we are going to train DeepLab-v3+ with the MobileNet-v2 backbone for the task of semantic segmentation on NYUDv2.
+In this example, we are going to train DeepLab-v3+ with the Xception-65 backbone for the task of semantic segmentation on NYUDv2.
 
 ## Prepare Data
 
