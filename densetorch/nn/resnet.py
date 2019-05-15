@@ -87,7 +87,7 @@ def resnet18(pretrained=False, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet.
 
     Returns:
-        `nn.Module' instance.
+        `nn.Module` instance.
 
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
@@ -102,7 +102,7 @@ def resnet34(pretrained=False, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet.
 
     Returns:
-        `nn.Module' instance.
+        `nn.Module` instance.
 
     """
     model = ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
@@ -117,7 +117,7 @@ def resnet50(pretrained=False, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet.
 
     Returns:
-        `nn.Module' instance.
+        `nn.Module` instance.
 
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
@@ -132,7 +132,7 @@ def resnet101(pretrained=False, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet.
 
     Returns:
-        `nn.Module' instance.
+        `nn.Module` instance.
 
     """
     model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
@@ -147,7 +147,7 @@ def resnet152(pretrained=False, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet.
 
     Returns:
-        `nn.Module' instance.
+        `nn.Module` instance.
 
     """
     model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
