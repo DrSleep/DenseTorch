@@ -85,6 +85,7 @@
 <li><a class="reference internal" href="#examples">Examples</a></li>
 <li><a class="reference internal" href="#motivation-behind-the-library">Motivation behind the library</a></li>
 <li><a class="reference internal" href="#future-work">Future Work</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
 <li><a class="reference internal" href="#citation">Citation</a></li>
 </ul>
 </li>
@@ -189,9 +190,9 @@ pip install -e .
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>Currently, we provide several models for single-task and multi-task setups.
-Concretely, the following networks are currently provided:</p>
+<p>Currently, we provide several models for single-task and multi-task setups:</p>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">resnet</span></code> ResNet-18/34/50/101/152.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mobilenet-v2</span></code> MobileNet-v2.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">xception-65</span></code> Xception-65.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">deeplab-v3+</span></code> DeepLab-v3+.</p></li>
@@ -208,6 +209,10 @@ Concretely, the following networks are currently provided:</p>
 <h2>Future Work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h2>
 <p>This library is still work-in-progress. More examples and more models will be added.
 Contributions are welcome.</p>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Is available <a class="reference external" href="https://drsleep.github.io/DenseTorch/">here</a>.</p>
 </div>
 <div class="section" id="citation">
 <h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
@@ -405,6 +410,76 @@ registered hooks while the latter silently ignores them.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><cite>nn.Module</cite> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-densetorch.nn.resnet"></span><dl class="function">
+<dt id="densetorch.nn.resnet.resnet18">
+<code class="descclassname">densetorch.nn.resnet.</code><code class="descname">resnet18</code><span class="sig-paren">(</span><em>pretrained=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.resnet.resnet18" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the ResNet-18 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a model pre-trained on ImageNet.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a href="#id4"><span class="problematic" id="id5">`</span></a>nn.Module’ instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.nn.resnet.resnet34">
+<code class="descclassname">densetorch.nn.resnet.</code><code class="descname">resnet34</code><span class="sig-paren">(</span><em>pretrained=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.resnet.resnet34" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the ResNet-34 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a model pre-trained on ImageNet.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a href="#id6"><span class="problematic" id="id7">`</span></a>nn.Module’ instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.nn.resnet.resnet50">
+<code class="descclassname">densetorch.nn.resnet.</code><code class="descname">resnet50</code><span class="sig-paren">(</span><em>pretrained=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.resnet.resnet50" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the ResNet-50 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a model pre-trained on ImageNet.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a href="#id8"><span class="problematic" id="id9">`</span></a>nn.Module’ instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.nn.resnet.resnet101">
+<code class="descclassname">densetorch.nn.resnet.</code><code class="descname">resnet101</code><span class="sig-paren">(</span><em>pretrained=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.resnet.resnet101" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the ResNet-101 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a model pre-trained on ImageNet.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a href="#id10"><span class="problematic" id="id11">`</span></a>nn.Module’ instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="densetorch.nn.resnet.resnet152">
+<code class="descclassname">densetorch.nn.resnet.</code><code class="descname">resnet152</code><span class="sig-paren">(</span><em>pretrained=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#densetorch.nn.resnet.resnet152" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the ResNet-152 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a model pre-trained on ImageNet.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a href="#id12"><span class="problematic" id="id13">`</span></a>nn.Module’ instance.</p>
 </dd>
 </dl>
 </dd></dl>

@@ -7,6 +7,18 @@ model_urls = {
     # Xception-65 encoder from DeepLab-v3+ pre-trained on COCO/VOC
     'xception65'  : ['xception65-81e46d91.pth',
                      'https://cloudstor.aarnet.edu.au/plus/s/gvEmFP3ngaJhvje/download'],
+    # Residual networks pre-trained on ImageNet
+    'resnet18'    : ['resnet18-5c106cde.pth',
+                     'https://download.pytorch.org/models/resnet18-5c106cde.pth'],
+    'resnet34'    : ['resnet34-333f7ec4.pth',
+                     'https://download.pytorch.org/models/resnet34-333f7ec4.pth'],
+    'resnet50'    : ['resnet50-19c8e357.pth',
+                     'https://download.pytorch.org/models/resnet50-19c8e357.pth'],
+    'resnet101'   : ['resnet101-5d3b4d8f.pth',
+                     'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth'],
+    'resnet152'   : ['resnet152-b121ed2d.pth',
+                     'https://download.pytorch.org/models/resnet152-b121ed2d.pth'],
+
 }
 
 # Xception with different output strides

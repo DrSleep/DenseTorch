@@ -26,6 +26,8 @@ The `nn` module implements a range of well-established encoders and decoders.
     :members:
 .. automodule:: densetorch.nn.mobilenetv2
     :members:
+.. automodule:: densetorch.nn.resnet
+    :members:
 .. automodule:: densetorch.nn.xception
     :members:
 

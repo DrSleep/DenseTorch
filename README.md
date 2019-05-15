@@ -14,9 +14,8 @@ pip install -e .
 
 ## Examples
 
-Currently, we provide several models for single-task and multi-task setups.
-Concretely, the following networks are currently provided:
-
+Currently, we provide several models for single-task and multi-task setups:
+ - `resnet` ResNet-18/34/50/101/152.
  - `mobilenet-v2` MobileNet-v2.
  - `xception-65` Xception-65.
  - `deeplab-v3+` DeepLab-v3+.
