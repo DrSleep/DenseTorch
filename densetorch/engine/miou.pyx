@@ -44,7 +44,9 @@ def compute_iu(np.ndarray[np.int_t, ndim=2] cm):
     cdef unsigned int ii = 0
     cdef unsigned int denom = 0
     cdef unsigned int n_classes = cm.shape[0]
-    cdef np.ndarray[np.float_t, ndim=1] IU = np.ones(n_classes)
+    # IU is between 0 and 1, hence any value larger than that can be safely ignored
+    cdef unsigned int default_value = 2
+    cdef np.ndarray[np.float_t, ndim=1] IU = np.ones(n_classes) * default_value
     cdef np.intp_t i
     for i in xrange(n_classes):
         pi = sum(cm[:, i])

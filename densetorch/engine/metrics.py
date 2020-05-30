@@ -39,7 +39,7 @@ class MeanIoU:
             self.num_classes)
 
     def val(self):
-        return np.mean([iu for iu in compute_iu(self.cm) if iu != 1.])
+        return np.mean([iu for iu in compute_iu(self.cm) if iu <= 1.0])
 
 class RMSE:
     """Root Mean Squared Error computational block for depth estimation.
