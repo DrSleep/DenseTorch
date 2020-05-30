@@ -1,6 +1,6 @@
 from setuptools import setup, Extension
 
-with open('requirements.txt') as f:
+with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 setup(
@@ -11,11 +11,11 @@ setup(
     description="Light-Weight PyTorch Wrapper for dense per-pixel tasks.",
     url="https://github.com/drsleep/densetorch",
     packages=["densetorch"],
-    setup_requires=[
-        'setuptools>=18.0',
-        'cython'],
+    setup_requires=["setuptools>=18.0", "cython"],
     install_requires=requirements,
     ext_modules=[
-        Extension('densetorch.engine.miou', sources=['./densetorch/engine/miou.pyx'])],
+        Extension("densetorch.engine.miou", sources=["./densetorch/engine/miou.pyx"])
+    ],
     classifiers=("Programming Language :: Python :: 3"),
-    zip_safe=False)
+    zip_safe=False,
+)

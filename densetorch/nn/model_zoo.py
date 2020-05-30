@@ -13,6 +13,7 @@ import tempfile
 try:
     from requests.utils import urlparse
     from requests import get as urlopen
+
     requests_available = True
 except ImportError:
     requests_available = False
@@ -28,7 +29,8 @@ except ImportError:
     tqdm = None  # defined below
 
 # matches bfd8deac from resnet18-bfd8deac.pth
-HASH_REGEX = re.compile(r'-([a-f0-9]*)\.')
+HASH_REGEX = re.compile(r"-([a-f0-9]*)\.")
+
 
 def load_url(nameurl, model_dir=None, map_location=None, progress=True):
     r"""Loads the Torch serialized object at the given URL.
@@ -55,11 +57,10 @@ def load_url(nameurl, model_dir=None, map_location=None, progress=True):
     """
     name, url = nameurl
     if model_dir is None:
-        torch_home = os.path.expanduser(os.getenv('TORCH_HOME', '~/.torch'))
-        model_dir = os.getenv('TORCH_MODEL_ZOO', os.path.join(torch_home, 'models'))
+        torch_home = os.path.expanduser(os.getenv("TORCH_HOME", "~/.torch"))
+        model_dir = os.getenv("TORCH_MODEL_ZOO", os.path.join(torch_home, "models"))
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
-    parts = urlparse(url)
     filename = name
     cached_file = os.path.join(model_dir, filename)
     if not os.path.exists(cached_file):
@@ -67,8 +68,8 @@ def load_url(nameurl, model_dir=None, map_location=None, progress=True):
         hash_prefix = HASH_REGEX.search(filename).group(1)
         _download_url_to_file(url, cached_file, hash_prefix, progress=progress)
     ckpt = torch.load(cached_file, map_location=map_location)
-    if 'state_dict' in ckpt:
-        return ckpt['state_dict']
+    if "state_dict" in ckpt:
+        return ckpt["state_dict"]
     else:
         return ckpt
 
@@ -81,7 +82,7 @@ def _download_url_to_file(url, dst, hash_prefix, progress):
     else:
         u = urlopen(url)
         meta = u.info()
-        if hasattr(meta, 'getheaders'):
+        if hasattr(meta, "getheaders"):
             file_size = int(meta.getheaders("Content-Length")[0])
         else:
             file_size = int(meta.get_all("Content-Length")[0])
@@ -103,9 +104,12 @@ def _download_url_to_file(url, dst, hash_prefix, progress):
         f.close()
         if hash_prefix is not None:
             digest = sha256.hexdigest()
-            if digest[:len(hash_prefix)] != hash_prefix:
-                raise RuntimeError('invalid hash value (expected "{}", got "{}")'
-                                   .format(hash_prefix, digest))
+            if digest[: len(hash_prefix)] != hash_prefix:
+                raise RuntimeError(
+                    'invalid hash value (expected "{}", got "{}")'.format(
+                        hash_prefix, digest
+                    )
+                )
         shutil.move(f.name, dst)
     finally:
         f.close()
@@ -116,7 +120,6 @@ def _download_url_to_file(url, dst, hash_prefix, progress):
 if tqdm is None:
     # fake tqdm if it's not installed
     class tqdm(object):
-
         def __init__(self, total, disable=False):
             self.total = total
             self.disable = disable
@@ -137,4 +140,4 @@ if tqdm is None:
             if self.disable:
                 return
 
-            sys.stderr.write('\n')
+            sys.stderr.write("\n")

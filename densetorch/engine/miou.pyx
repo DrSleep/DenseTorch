@@ -56,4 +56,3 @@ def compute_iu(np.ndarray[np.int_t, ndim=2] cm):
         if denom > 0:
             IU[i] = ii / denom
     return IU
-

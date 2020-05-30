@@ -3,12 +3,8 @@ from tqdm import tqdm
 
 from ..misc.utils import AverageMeter, make_list
 
-def train(
-        model,
-        opts,
-        crits,
-        dataloader,
-        loss_coeffs):
+
+def train(model, opts, crits, dataloader, loss_coeffs):
     """Full Training Pipeline.
 
     Supports multiple optimisers, multiple criteria, \
@@ -39,21 +35,17 @@ def train(
 
     for sample in pbar:
         loss = 0.0
-        input = sample['image'].float().cuda()
+        input = sample["image"].float().cuda()
         targets = [sample[k].cuda() for k in dataloader.dataset.masks_names]
         outputs = model(input)
         outputs = make_list(outputs)
-        for out, target, crit, loss_coeff in zip(outputs, targets,\
-                                                 crits, loss_coeffs):
-            loss += (loss_coeff *
-                     crit(
-                         F.interpolate(
-                             out,
-                             size=target.size()[1:],
-                             mode='bilinear',
-                             align_corners=False).squeeze(dim=1),
-                         target.squeeze(dim=1))
-                    )
+        for out, target, crit, loss_coeff in zip(outputs, targets, crits, loss_coeffs):
+            loss += loss_coeff * crit(
+                F.interpolate(
+                    out, size=target.size()[1:], mode="bilinear", align_corners=False
+                ).squeeze(dim=1),
+                target.squeeze(dim=1),
+            )
         for opt in opts:
             opt.zero_grad()
         loss.backward()
@@ -61,12 +53,12 @@ def train(
             opt.step()
 
         loss_meter.update(loss.item())
-        pbar.set_description("Loss {:.3f} | Avg. Loss {:.3f}"
-                             .format(loss.item(), loss_meter.avg))
+        pbar.set_description(
+            "Loss {:.3f} | Avg. Loss {:.3f}".format(loss.item(), loss_meter.avg)
+        )
 
-def trainbal(
-        model,
-        dataloader):
+
+def trainbal(model, dataloader):
     """Full Training Pipeline with balanced model.
 
     Assumes that the model.eval() property has been set up properly \
@@ -86,17 +78,16 @@ def trainbal(
 
     for sample in pbar:
         loss = 0.0
-        input = sample['image'].float().cuda()
+        input = sample["image"].float().cuda()
         targets = [sample[k].cuda() for k in dataloader.dataset.masks_names]
         loss = model(input, targets)
         loss_meter.update(loss.item())
-        pbar.set_description("Loss {:.3f} | Avg. Loss {:.3f}"
-                             .format(loss.item(), loss_meter.avg))
+        pbar.set_description(
+            "Loss {:.3f} | Avg. Loss {:.3f}".format(loss.item(), loss_meter.avg)
+        )
 
-def validate(
-        model,
-        metrics,
-        dataloader):
+
+def validate(model, metrics, dataloader):
     """Full Validation Pipeline.
 
     Support multiple metrics (but 1 per modality), multiple outputs.
@@ -118,25 +109,30 @@ def validate(
     model.eval()
     metrics = make_list(metrics)
     pbar = tqdm(dataloader)
+
     def get_val(metrics):
         results = [(m.name, m.val()) for m in metrics]
         names, vals = list(zip(*results))
-        out = ['{} : {:4f}'.format(name, val) for name, val in results]
-        return vals, ' | '.join(out)
+        out = ["{} : {:4f}".format(name, val) for name, val in results]
+        return vals, " | ".join(out)
+
     for sample in pbar:
-        input = sample['image'].float().cuda()
-        targets = [sample[k].squeeze(dim=1).numpy()
-                   for k in dataloader.dataset.masks_names]
+        input = sample["image"].float().cuda()
+        targets = [
+            sample[k].squeeze(dim=1).numpy() for k in dataloader.dataset.masks_names
+        ]
         outputs = model(input)
         outputs = make_list(outputs)
         for out, target, metric in zip(outputs, targets, metrics):
             metric.update(
                 F.interpolate(
-                    out,
-                    size=target.shape[1:],
-                    mode='bilinear',
-                    align_corners=False).squeeze(dim=1).cpu().numpy(),
-                target)
+                    out, size=target.shape[1:], mode="bilinear", align_corners=False
+                )
+                .squeeze(dim=1)
+                .cpu()
+                .numpy(),
+                target,
+            )
         pbar.set_description(get_val(metrics)[1])
     vals, _ = get_val(metrics)
     print("----" * 5)

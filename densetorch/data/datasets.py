@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 
+
 class MMDataset(Dataset):
     """Multi-Modality dataset.
 
@@ -24,16 +25,18 @@ class MMDataset(Dataset):
         stage (str): initial stage of dataset - either 'train' or 'val'.
 
     """
+
     def __init__(
-            self,
-            data_file,
-            data_dir,
-            line_to_paths_fn,
-            masks_names,
-            transform_trn=None,
-            transform_val=None,
-            stage='train'):
-        with open(data_file, 'rb') as f:
+        self,
+        data_file,
+        data_dir,
+        line_to_paths_fn,
+        masks_names,
+        transform_trn=None,
+        transform_val=None,
+        stage="train",
+    ):
+        with open(data_file, "rb") as f:
             datalist = f.readlines()
         self.datalist = [line_to_paths_fn(ll) for ll in datalist]
         self.root_dir = data_dir
@@ -55,23 +58,21 @@ class MMDataset(Dataset):
         return len(self.datalist)
 
     def __getitem__(self, idx):
-        names = [
-            os.path.join(self.root_dir, rpath) for rpath in self.datalist[idx]]
+        names = [os.path.join(self.root_dir, rpath) for rpath in self.datalist[idx]]
         image = self.read_image(names[0])
         masks = [np.array(Image.open(msk_name)) for msk_name in names[1:]]
-        sample = {'image' : image}
+        sample = {"image": image}
         for key, mask in zip(self.masks_names, masks):
-            assert len(mask.shape) == 2, \
-                    'Masks must be encoded without colourmap'
+            assert len(mask.shape) == 2, "Masks must be encoded without colourmap"
             sample[key] = mask
-        sample['names'] = self.masks_names
-        if self.stage == 'train':
+        sample["names"] = self.masks_names
+        if self.stage == "train":
             if self.transform_trn:
                 sample = self.transform_trn(sample)
-        elif self.stage == 'val':
+        elif self.stage == "val":
             if self.transform_val:
                 sample = self.transform_val(sample)
-        del sample['names']
+        del sample["names"]
         return sample
 
     @staticmethod
@@ -85,6 +86,6 @@ class MMDataset(Dataset):
 
         """
         img_arr = np.array(Image.open(x))
-        if len(img_arr.shape) == 2: # grayscale
+        if len(img_arr.shape) == 2:  # grayscale
             img_arr = np.tile(img_arr, [3, 1, 1]).transpose(1, 2, 0)
         return img_arr

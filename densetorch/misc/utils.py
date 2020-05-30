@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 def get_args(func):
     """Get function's arguments.
 
@@ -17,8 +18,12 @@ def get_args(func):
       List of positional and keyword arguments.
 
     """
-    return [p.name for p in signature(func).parameters.values()
-            if p.kind == p.POSITIONAL_OR_KEYWORD]
+    return [
+        p.name
+        for p in signature(func).parameters.values()
+        if p.kind == p.POSITIONAL_OR_KEYWORD
+    ]
+
 
 def compute_params(model):
     """Compute the total number of parameters.
@@ -31,6 +36,7 @@ def compute_params(model):
 
     """
     return sum([p.numel() for p in model.parameters()])
+
 
 def create_optim(enc, parameters, **kwargs):
     """Initialise optimisers.
@@ -46,20 +52,24 @@ def create_optim(enc, parameters, **kwargs):
       ValueError if enc is not either of 'SGD' or 'Adam'.
 
     """
-    if enc == 'SGD':
+    if enc == "SGD":
         optim = torch.optim.SGD
-    elif enc == 'Adam':
+    elif enc == "Adam":
         optim = torch.optim.Adam
     else:
-        raise ValueError("Optim {} is not supported. "
-                         "Only supports 'SGD' and 'Adam' for now.".format(enc))
+        raise ValueError(
+            "Optim {} is not supported. "
+            "Only supports 'SGD' and 'Adam' for now.".format(enc)
+        )
     args = get_args(optim)
-    kwargs = {key : kwargs[key] for key in args if key in kwargs}
+    kwargs = {key: kwargs[key] for key in args if key in kwargs}
     return optim(parameters, **kwargs)
+
 
 def ctime():
     """Returns current timestamp in the format of hours-minutes-seconds."""
-    return datetime.now().strftime('%H:%M:%S')
+    return datetime.now().strftime("%H:%M:%S")
+
 
 def make_list(x):
     """Returns the given input as a list."""
@@ -69,6 +79,7 @@ def make_list(x):
         return list(x)
     else:
         return [x]
+
 
 def set_seed(seed):
     """Setting the random seed across `torch`, `numpy` and `random` libraries.
@@ -83,6 +94,7 @@ def set_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
 
+
 class AverageMeter:
     """Simple running average estimator.
 
@@ -90,6 +102,7 @@ class AverageMeter:
       momentum (float): running average decay.
 
     """
+
     def __init__(self, momentum=0.99):
         self.momentum = momentum
         self.avg = 0
@@ -108,8 +121,9 @@ class AverageMeter:
         if self.val is None:
             self.avg = val
         else:
-            self.avg = self.avg * self.momentum + val * (1. - self.momentum)
+            self.avg = self.avg * self.momentum + val * (1.0 - self.momentum)
         self.val = val
+
 
 class Saver:
     """Saver class for monitoring the training progress.
@@ -129,6 +143,7 @@ class Saver:
                        the corresponding comparison function.
 
     """
+
     def __init__(self, init_vals, comp_fns):
         self.vals = init_vals
         self.comp_fns = comp_fns
@@ -157,6 +172,7 @@ class Saver:
         self.vals = update_vals
         return True
 
+
 class Balancer(nn.Module):
     """Wrapper for balanced multi-GPU training.
 
@@ -170,6 +186,7 @@ class Balancer(nn.Module):
       loss_coeffs (list of single instance of float): loss coefficients.
 
     """
+
     def __init__(self, model, opts, crits, loss_coeffs):
         super(Balancer, self).__init__()
         self.model = model
@@ -196,16 +213,21 @@ class Balancer(nn.Module):
             return outputs
         outputs = make_list(outputs)
         losses = []
-        for out, target, crit, loss_coeff in \
-                zip(outputs, targets, self.crits, self.loss_coeffs):
-            losses.append(loss_coeff *
-                          crit(
-                              F.interpolate(
-                                  out,
-                                  size=target.size()[1:],
-                                  mode='bilinear',
-                                  align_corners=False).squeeze(dim=1),
-                              target.squeeze(dim=1)))
+        for out, target, crit, loss_coeff in zip(
+            outputs, targets, self.crits, self.loss_coeffs
+        ):
+            losses.append(
+                loss_coeff
+                * crit(
+                    F.interpolate(
+                        out,
+                        size=target.size()[1:],
+                        mode="bilinear",
+                        align_corners=False,
+                    ).squeeze(dim=1),
+                    target.squeeze(dim=1),
+                )
+            )
         for opt in self.opts:
             opt.zero_grad()
         loss = torch.stack(losses).mean()

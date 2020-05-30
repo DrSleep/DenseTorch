@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from .layer_factory import CRPBlock, batchnorm, conv1x1, conv3x3, sepconv_bn
 from ..misc.utils import make_list
 
+
 class DLv3plus(nn.Module):
     """DeepLab-v3+ for Semantic Image Segmentation.
 
@@ -21,13 +22,10 @@ class DLv3plus(nn.Module):
       rates (list of ints): dilation rates in the ASPP module.
 
     """
+
     def __init__(
-            self,
-            input_sizes,
-            num_classes,
-            skip_size=48,
-            agg_size=256,
-            rates=(6, 12, 18)):
+        self, input_sizes, num_classes, skip_size=48, agg_size=256, rates=(6, 12, 18)
+    ):
         super(DLv3plus, self).__init__()
 
         skip_convs = nn.ModuleList()
@@ -40,44 +38,46 @@ class DLv3plus(nn.Module):
                 nn.Sequential(
                     conv1x1(size, skip_size, bias=False),
                     batchnorm(skip_size),
-                    nn.ReLU(inplace=False)))
+                    nn.ReLU(inplace=False),
+                )
+            )
         # ASPP
         aspp.append(
             nn.Sequential(
                 nn.AdaptiveAvgPool2d(1),
                 conv1x1(input_sizes[-1], agg_size, bias=False),
                 batchnorm(agg_size),
-                nn.ReLU(inplace=False)))
+                nn.ReLU(inplace=False),
+            )
+        )
         aspp.append(
             nn.Sequential(
                 conv1x1(input_sizes[-1], agg_size, bias=False),
                 batchnorm(agg_size),
-                nn.ReLU(inplace=False)))
+                nn.ReLU(inplace=False),
+            )
+        )
         for rate in rates:
             aspp.append(
-                sepconv_bn(
-                    input_sizes[-1],
-                    agg_size,
-                    rate=rate,
-                    depth_activation=True))
+                sepconv_bn(input_sizes[-1], agg_size, rate=rate, depth_activation=True)
+            )
         aspp.append(
             nn.Sequential(
                 conv1x1(agg_size * 5, agg_size, bias=False),
                 batchnorm(agg_size),
                 nn.ReLU(inplace=False),
-                nn.Dropout(p=0.1)))
+                nn.Dropout(p=0.1),
+            )
+        )
 
         self.skip_convs = skip_convs
         self.aspp = aspp
         self.dec = nn.Sequential(
             sepconv_bn(
-                agg_size + len(skip_convs) * skip_size,
-                agg_size,
-                depth_activation=True),
-            sepconv_bn(
-                agg_size,
-                agg_size,
-                depth_activation=True))
+                agg_size + len(skip_convs) * skip_size, agg_size, depth_activation=True
+            ),
+            sepconv_bn(agg_size, agg_size, depth_activation=True),
+        )
         self.clf = conv1x1(agg_size, num_classes, bias=True)
 
     def forward(self, xs):
@@ -86,10 +86,8 @@ class DLv3plus(nn.Module):
         aspp = [branch(xs[-1]) for branch in self.aspp[:-1]]
         # Upsample GAP
         aspp[0] = F.interpolate(
-            aspp[0],
-            size=xs[-1].size()[2:],
-            mode='bilinear',
-            align_corners=True)
+            aspp[0], size=xs[-1].size()[2:], mode="bilinear", align_corners=True
+        )
         aspp = torch.cat(aspp, dim=1)
         # Apply last conv in ASPP
         aspp = self.aspp[-1](aspp)
@@ -98,14 +96,14 @@ class DLv3plus(nn.Module):
         for x in skips[1:] + [aspp]:
             dec.append(
                 F.interpolate(
-                    x,
-                    size=dec[0].size()[2:],
-                    mode='bilinear',
-                    align_corners=True))
+                    x, size=dec[0].size()[2:], mode="bilinear", align_corners=True
+                )
+            )
         dec = torch.cat(dec, dim=1)
         dec = self.dec(dec)
         out = self.clf(dec)
         return out
+
 
 class LWRefineNet(nn.Module):
     """Light-Weight RefineNet for Semantic Image Segmentation.
@@ -121,13 +119,8 @@ class LWRefineNet(nn.Module):
       n_crp (int): number of CRP layers in a single CRP block.
 
     """
-    def __init__(
-            self,
-            input_sizes,
-            collapse_ind,
-            num_classes,
-            agg_size=256,
-            n_crp=4):
+
+    def __init__(self, input_sizes, collapse_ind, num_classes, agg_size=256, n_crp=4):
         super(LWRefineNet, self).__init__()
 
         stem_convs = nn.ModuleList()
@@ -160,8 +153,9 @@ class LWRefineNet(nn.Module):
         for idx, (conv, x) in enumerate(zip(self.stem_convs, xs)):
             xs[idx] = conv(x)
         # Collapse layers
-        c_xs = [sum([xs[idx] for idx in make_list(c_idx)])
-                for c_idx in self.collapse_ind]
+        c_xs = [
+            sum([xs[idx] for idx in make_list(c_idx)]) for c_idx in self.collapse_ind
+        ]
 
         for idx, (crp, x) in enumerate(zip(self.crp_blocks, c_xs)):
             if idx == 0:
@@ -174,8 +168,9 @@ class LWRefineNet(nn.Module):
                 y = F.interpolate(
                     y,
                     size=c_xs[idx + 1].size()[2:],
-                    mode='bilinear',
-                    align_corners=True)
+                    mode="bilinear",
+                    align_corners=True,
+                )
         out_segm = self.segm(y)
         return out_segm
 
@@ -196,6 +191,7 @@ class LWRefineNet(nn.Module):
         layers = [CRPBlock(in_planes, out_planes, stages)]
         return nn.Sequential(*layers)
 
+
 class MTLWRefineNet(nn.Module):
     """Multi-Task Light-Weight RefineNet for Dense per-pixel tasks.
 
@@ -210,13 +206,8 @@ class MTLWRefineNet(nn.Module):
       n_crp (int): number of CRP layers in a single CRP block.
 
     """
-    def __init__(
-            self,
-            input_sizes,
-            collapse_ind,
-            num_classes,
-            agg_size=256,
-            n_crp=4):
+
+    def __init__(self, input_sizes, collapse_ind, num_classes, agg_size=256, n_crp=4):
         super(MTLWRefineNet, self).__init__()
 
         stem_convs = nn.ModuleList()
@@ -245,10 +236,13 @@ class MTLWRefineNet(nn.Module):
 
         num_classes = make_list(num_classes)
         for n_out in num_classes:
-            heads.append(nn.Sequential(
-                conv1x1(agg_size, agg_size, groups=agg_size, bias=False),
-                nn.ReLU6(inplace=False),
-                conv3x3(agg_size, n_out, bias=True)))
+            heads.append(
+                nn.Sequential(
+                    conv1x1(agg_size, agg_size, groups=agg_size, bias=False),
+                    nn.ReLU6(inplace=False),
+                    conv3x3(agg_size, n_out, bias=True),
+                )
+            )
 
         self.heads = heads
         self.relu = nn.ReLU6(inplace=True)
@@ -258,9 +252,10 @@ class MTLWRefineNet(nn.Module):
         xs = list(reversed(xs))
         for idx, (conv, x) in enumerate(zip(self.stem_convs, xs)):
             xs[idx] = conv(x)
-         # Collapse layers
-        c_xs = [sum([xs[idx] for idx in make_list(c_idx)])
-                for c_idx in self.collapse_ind]
+        # Collapse layers
+        c_xs = [
+            sum([xs[idx] for idx in make_list(c_idx)]) for c_idx in self.collapse_ind
+        ]
 
         for idx, (crp, x) in enumerate(zip(self.crp_blocks, c_xs)):
             if idx == 0:
@@ -273,8 +268,9 @@ class MTLWRefineNet(nn.Module):
                 y = F.interpolate(
                     y,
                     size=c_xs[idx + 1].size()[2:],
-                    mode='bilinear',
-                    align_corners=True)
+                    mode="bilinear",
+                    align_corners=True,
+                )
 
         outs = []
         for head in self.heads:
