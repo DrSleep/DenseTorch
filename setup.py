@@ -1,4 +1,4 @@
-from setuptools import setup, Extension
+from setuptools import Extension, find_packages, setup
 
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
@@ -10,7 +10,7 @@ setup(
     author_email="nekrasowladimir.at.gmail.com",
     description="Light-Weight PyTorch Wrapper for dense per-pixel tasks.",
     url="https://github.com/drsleep/densetorch",
-    packages=["densetorch"],
+    packages=find_packages(exclude=("examples/",)),
     setup_requires=["setuptools>=18.0", "cython"],
     install_requires=requirements,
     ext_modules=[
