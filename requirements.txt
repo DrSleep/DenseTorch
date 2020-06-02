@@ -4,4 +4,5 @@ opencv-python>=3.4.4.19
 Pillow>=5.3.0
 torch>=1.0.0
 torchvision>=0.2.1
+albumentations>=0.4.5
 tqdm>=4.28.1

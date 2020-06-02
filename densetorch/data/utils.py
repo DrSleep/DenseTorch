@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import torch
 
+from albumentations import Compose
+
 from ..misc.utils import make_list
 
 # Usual dtypes for common modalities
@@ -188,3 +190,25 @@ class ToTensor(object):
                 KEYS_TO_DTYPES[msk_key]
             )
         return sample
+
+
+def densetorch2albumentation(augmentation):
+    """Wrapper to use Albumentations within DenseTorch.
+
+    Args:
+      augmentation: either a list of augmentations or a single augmentation
+
+    Returns:
+      A composition of augmentations
+
+    """
+
+    def wrapper_func(sample):
+        del sample["names"]
+        targets = {
+            name: "image" if name == "image" else "mask" for name in sample.keys()
+        }
+        output = Compose(make_list(augmentation), additional_targets=targets)(**sample)
+        return output
+
+    return wrapper_func
