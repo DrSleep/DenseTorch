@@ -204,7 +204,8 @@ def densetorch2albumentation(augmentation):
     """
 
     def wrapper_func(sample):
-        del sample["names"]
+        if "names" in sample:
+            del sample["names"]
         targets = {
             name: "image" if name == "image" else "mask" for name in sample.keys()
         }
