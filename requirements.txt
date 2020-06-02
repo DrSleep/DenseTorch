@@ -6,4 +6,4 @@ torch>=1.0.0
 torchvision>=0.2.1
 albumentations>=0.4.5
 tqdm>=4.28.1
-scikit-image>=0.17.1
+scikit-image>=0.15.0
