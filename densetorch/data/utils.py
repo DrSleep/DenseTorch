@@ -213,3 +213,25 @@ def densetorch2albumentation(augmentation):
         return output
 
     return wrapper_func
+
+
+def denormalise(tensor_bchw, scale, mean_c, std_c):
+    """Reversed normalisation
+
+    Args:
+      tensor_bchw (torch.tensor): 4D tensor of shape BxCxHxW
+      scale (float): scale value
+      mean_c (np.ndarray): mean array of shape (C,)
+      std_c (np.ndarray): standard deviation array of shape (C,)
+
+    Returns:
+      Un-normalised torch tensor.
+
+    """
+    mean_bchw = (
+        torch.from_numpy(mean_c[None, :, None, None]).float().to(tensor_bchw.device)
+    )
+    std_bchw = (
+        torch.from_numpy(std_c[None, :, None, None]).float().to(tensor_bchw.device)
+    )
+    return (tensor_bchw * std_bchw + mean_bchw) / scale

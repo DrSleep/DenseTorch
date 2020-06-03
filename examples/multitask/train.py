@@ -19,20 +19,14 @@ collapse_ind = [[0, 1], [2, 3], 4, 5]
 dt.misc.set_seed(seed)
 
 # data setup
-transform_def = [dt.data.Normalise(*normalise_params), dt.data.ToTensor()]
-transform_trn = transforms.Compose(
-    [dt.data.RandomMirror(), dt.data.RandomCrop(crop_size)] + transform_def
+transform_common = [dt.data.Normalise(*normalise_params), dt.data.ToTensor()]
+transform_train = transforms.Compose(
+    [dt.data.RandomMirror(), dt.data.RandomCrop(crop_size)] + transform_common
 )
-transform_val = transforms.Compose(transform_def)
+transform_val = transforms.Compose(transform_common)
 trainloader = DataLoader(
     dt.data.MMDataset(
-        data_file,
-        data_dir,
-        line_to_paths_fn,
-        masks_names,
-        transform_trn,
-        transform_val,
-        "train",
+        data_file, data_dir, line_to_paths_fn, masks_names, transform=transform_train,
     ),
     batch_size=batch_size,
     shuffle=True,
@@ -42,13 +36,7 @@ trainloader = DataLoader(
 )
 valloader = DataLoader(
     dt.data.MMDataset(
-        val_file,
-        data_val_dir,
-        line_to_paths_fn,
-        masks_names,
-        transform_trn,
-        transform_val,
-        "val",
+        val_file, data_val_dir, line_to_paths_fn, masks_names, transform=transform_val,
     ),
     batch_size=val_batch_size,
     shuffle=False,

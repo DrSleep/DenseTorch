@@ -7,4 +7,5 @@ from .utils import (
     ResizeAndScale,
     ToTensor,
     densetorch2albumentation,
+    denormalise,
 )
