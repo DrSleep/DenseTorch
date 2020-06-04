@@ -1,7 +1,10 @@
+import json
+import os
 import random
 from datetime import datetime
 from inspect import signature
 
+import logging
 import numpy as np
 import torch
 import torch.nn as nn
@@ -126,51 +129,98 @@ class AverageMeter:
 
 
 class Saver:
-    """Saver class for monitoring the training progress.
+    """Saver class for checkpointing the training progress."""
 
-    Given initial values and comparison functions, Saver keeps track of newly \
-    added values and updates them in case all of the new values satisfy the \
-    corresponding comparison functions.
-
-    Args:
-      init_vals (list): initial values. Represent lower bounds for performance
-                        of each task.
-      comp_fns (list): list of comparison functions.
-                       Each function takes two inputs and produces
-                       one boolean output.
-                       Each newly provided value
-                       will be compared against the initial value using
-                       the corresponding comparison function.
-
-    """
-
-    def __init__(self, init_vals, comp_fns):
-        self.vals = init_vals
-        self.comp_fns = comp_fns
-
-    def save(self, new_vals):
-        """Saving criterion.
-
-        Checks whether the saving criterion is trigerred. The saving occurs \
-        when all newly added values satisfy their corresponding comparison \
-        functions.
-
+    def __init__(
+        self,
+        args,
+        ckpt_dir,
+        best_val=0,
+        condition=lambda x, y: x > y,
+        save_interval=100,
+        save_several_mode=any,
+    ):
+        """
         Args:
-          new_vals (list): new values for comparison.
-
-        Returns:
-          `True` if all comparison functions return `True`.
-          Otherwise, returns `False`.
+            args (dict): dictionary with arguments.
+            ckpt_dir (str): path to directory in which to store the checkpoint.
+            best_val (float or list of floats): initial best value.
+            condition (function or list of functions): how to decide whether to save
+                                                       the new checkpoint by comparing
+                                                       best value and new value (x,y).
+            save_interval (int): always save when the interval is triggered.
+            save_several_mode (any or all): if there are multiple savers, how to trigger
+                                            the saving.
 
         """
-        update_vals = []
-        for (old_val, new_val, op) in zip(self.vals, new_vals, self.comp_fns):
-            if op(new_val, old_val):
-                update_vals.append(new_val)
-            else:
-                return False
-        self.vals = update_vals
-        return True
+        if save_several_mode not in [all, any]:
+            raise ValueError(
+                f"save_several_mode must be either all or any, got {save_several_mode}"
+            )
+        if not os.path.exists(ckpt_dir):
+            os.makedirs(ckpt_dir)
+        with open("{}/args.json".format(ckpt_dir), "w") as f:
+            json.dump(
+                {k: self.serialise(v) for k, v in args.items()},
+                f,
+                sort_keys=True,
+                indent=4,
+                ensure_ascii=False,
+            )
+        self.ckpt_dir = ckpt_dir
+        self.best_val = make_list(best_val)
+        self.condition = make_list(condition)
+        self._counter = 0
+        self._save_interval = save_interval
+        self.save_several_mode = save_several_mode
+        self.logger = logging.getLogger(__name__)
+
+    def _do_save(self, new_val):
+        """Check whether need to save"""
+        do_save = [
+            condition(val, best_val)
+            for (condition, val, best_val) in zip(
+                self.condition, new_val, self.best_val,
+            )
+        ]
+        return self.save_several_mode(do_save)
+
+    def save(self, new_val, dict_to_save):
+        """Save new checkpoint"""
+        self._counter += 1
+        if "epoch" not in dict_to_save:
+            dict_to_save["epoch"] = self._counter
+        new_val = make_list(new_val)
+        if self._do_save(new_val):
+            for (val, best_val) in zip(new_val, self.best_val):
+                self.logger.info(
+                    " New best value {:.4f}, was {:.4f}".format(val, best_val)
+                )
+            self.best_val = new_val
+            dict_to_save["best_val"] = new_val
+            torch.save(dict_to_save, "{}/checkpoint.pth.tar".format(self.ckpt_dir))
+            return True
+        elif self._counter % self._save_interval == 0:
+            self.logger.info(" Saving at epoch {}.".format(dict_to_save["epoch"]))
+            dict_to_save["best_val"] = self.best_val
+            torch.save(
+                dict_to_save, "{}/counter_checkpoint.pth.tar".format(self.ckpt_dir)
+            )
+            return False
+        return False
+
+    @staticmethod
+    def serialise(x):
+        if isinstance(x, (list, tuple)):
+            return [Saver.serialise(item) for item in x]
+        elif isinstance(x, np.ndarray):
+            return x.tolist()
+        elif isinstance(x, (int, float, str)):
+            return x
+        elif x is None:
+            return x
+        else:
+            pass
 
 
 class Balancer(nn.Module):

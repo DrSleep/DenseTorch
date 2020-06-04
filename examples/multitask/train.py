@@ -8,8 +8,6 @@ import densetorch as dt
 from config import *
 
 # model_options
-## decoder
-ckpt_postfix = "mtrflw-nyudv2"
 ## encoder
 pretrained = True
 return_idx = [1, 2, 3, 4, 5, 6]
@@ -84,8 +82,6 @@ for i in range(n_epochs):
         model1.eval()
         with torch.no_grad():
             vals = dt.engine.validate(model1, metrics, valloader)
-        if saver.save(vals):
-            print("Saving")
-            torch.save(
-                model1.state_dict(), "checkpoint_{}.pth.tar".format(ckpt_postfix)
-            )
+        saver.save(
+            new_val=vals, dict_to_save={"state_dict": model1.state_dict(), "epoch": i}
+        )

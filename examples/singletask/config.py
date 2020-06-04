@@ -56,4 +56,11 @@ loss_coeffs = (1.0,)
 # saving criterions
 init_vals = (0.0,)
 comp_fns = [operator.gt]
-saver = dt.misc.Saver(init_vals, comp_fns)
+ckpt_dir = "./"
+saver = dt.misc.Saver(
+    args=locals(),
+    ckpt_dir=ckpt_dir,
+    best_val=init_vals,
+    condition=comp_fns,
+    save_several_mode=all,
+)
