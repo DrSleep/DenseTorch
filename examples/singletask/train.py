@@ -48,6 +48,12 @@ enc = dt.nn.xception65(pretrained=pretrained, return_idx=return_idx)
 dec = dt.nn.DLv3plus(enc._out_c, num_classes, rates=enc.rates)
 model1 = nn.DataParallel(nn.Sequential(enc, dec).cuda())
 print("Model has {} parameters".format(dt.misc.compute_params(model1)))
+start_epoch, _, state_dict = saver.load(
+    ckpt_path=ckpt_path, keys_to_load=["epoch", "best_val", "state_dict"],
+)
+dt.misc.load_state_dict(model1, state_dict)
+if start_epoch is None:
+    start_epoch = 0
 
 # optim setup
 optims = [
@@ -64,11 +70,11 @@ opt_scheds = []
 for opt in optims:
     opt_scheds.append(
         torch.optim.lr_scheduler.MultiStepLR(
-            opt, np.arange(1, n_epochs, 100), gamma=0.1
+            opt, np.arange(start_epoch + 1, n_epochs, 100), gamma=0.1
         )
     )
 
-for i in range(n_epochs):
+for i in range(start_epoch, n_epochs):
     for sched in opt_scheds:
         sched.step(i)
     model1.train()

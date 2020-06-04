@@ -57,6 +57,7 @@ loss_coeffs = (1.0,)
 init_vals = (0.0,)
 comp_fns = [operator.gt]
 ckpt_dir = "./"
+ckpt_path = "./checkpoint.pth.tar"
 saver = dt.misc.Saver(
     args=locals(),
     ckpt_dir=ckpt_dir,

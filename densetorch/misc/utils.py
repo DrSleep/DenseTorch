@@ -74,6 +74,25 @@ def ctime():
     return datetime.now().strftime("%H:%M:%S")
 
 
+def load_state_dict(model, state_dict, strict=False):
+    if state_dict is None:
+        return
+    logger = logging.getLogger(__name__)
+    # When using dataparallel, 'module.' is prepended to the parameters' keys
+    # This function handles the cases when state_dict was saved without DataParallel
+    # But the user wants to load it into the model created with dataparallel, and
+    # vice versa
+    is_module_model_dict = list(model.state_dict().keys())[0].startswith("module")
+    is_module_state_dict = list(state_dict.keys())[0].startswith("module")
+    if is_module_model_dict and is_module_state_dict:
+        pass
+    elif is_module_model_dict:
+        state_dict = {"module." + k: v for k, v in state_dict.items()}
+    elif is_module_state_dict:
+        state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+    logger.info(model.load_state_dict(state_dict, strict=strict))
+
+
 def make_list(x):
     """Returns the given input as a list."""
     if isinstance(x, list):
@@ -208,6 +227,28 @@ class Saver:
             )
             return False
         return False
+
+    def load(self, ckpt_path, keys_to_load):
+        """Loads existing checkpoint if exists.
+
+        Args:
+          ckpt_path (str): path to the checkpoint.
+          keys_to_load (list of str): keys to load from the checkpoint.
+
+        Returns the epoch at which the checkpoint was saved.
+        """
+        keys_to_load = make_list(keys_to_load)
+        if not os.path.exists(ckpt_path):
+            return [None] * len(keys_to_load)
+        ckpt = torch.load(ckpt_path)
+        loaded = []
+        for key in keys_to_load:
+            val = ckpt.get(key, None)
+            if key == "best_val" and val is not None:
+                self.best_val = make_list(val)
+                self.logger.info(f" Found checkpoint with best values {self.best_val}")
+            loaded.append(val)
+        return loaded
 
     @staticmethod
     def serialise(x):

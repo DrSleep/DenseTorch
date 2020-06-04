@@ -58,6 +58,7 @@ loss_coeffs = (0.5, 0.5)  # equal weights per task
 init_vals = (0.0, 10000.0)
 comp_fns = [operator.gt, operator.lt]
 ckpt_dir = "./"
+ckpt_path = "./checkpoint.pth.tar"
 saver = dt.misc.Saver(
     args=locals(),
     ckpt_dir=ckpt_dir,
