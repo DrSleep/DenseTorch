@@ -3,8 +3,6 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from albumentations import Compose
-
 from ..misc.utils import broadcast, make_list
 
 # Usual dtypes for common modalities
@@ -193,8 +191,8 @@ class ToTensor(object):
         return sample
 
 
-def densetorch2albumentation(augmentation):
-    """Wrapper to use Albumentations within DenseTorch.
+def albumentations2densetorch(augmentation):
+    """Wrapper to use Albumentations within DenseTorch dataset.
 
     Args:
       augmentation: either a list of augmentations or a single augmentation
@@ -203,6 +201,7 @@ def densetorch2albumentation(augmentation):
       A composition of augmentations
 
     """
+    from albumentations import Compose
 
     def wrapper_func(sample):
         if "names" in sample:
@@ -212,6 +211,34 @@ def densetorch2albumentation(augmentation):
         }
         output = Compose(make_list(augmentation), additional_targets=targets)(**sample)
         return output
+
+    return wrapper_func
+
+
+def densetorch2torchvision(augmentation):
+    """Wrapper to use DenseTorch augmentations within torchvision dataset.
+
+    Args:
+      augmentation: either a list of augmentations or a single augmentation
+
+    Returns:
+      A composition of augmentations.
+
+    """
+    from torchvision.transforms import Compose
+
+    def wrapper_func(image, target):
+        keys = ["image", "mask"]
+        names = ["mask"]
+        np_dtypes = [np.float32, np.uint8]
+        torch_dtypes = [torch.float32, torch.long]
+        sample_dict = {
+            key: np.array(value, dtype=dtype)
+            for key, value, dtype in zip(keys, [image, target], np_dtypes)
+        }
+        sample_dict["names"] = names
+        output = Compose(make_list(augmentation))(sample_dict)
+        return [output[key].to(dtype) for key, dtype in zip(keys, torch_dtypes)]
 
     return wrapper_func
 

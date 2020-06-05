@@ -6,7 +6,8 @@ from .utils import (
     RandomMirror,
     ResizeAndScale,
     ToTensor,
-    densetorch2albumentation,
+    albumentations2densetorch,
+    densetorch2torchvision,
     denormalise,
     get_loaders,
 )
