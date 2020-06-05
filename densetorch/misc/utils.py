@@ -11,6 +11,22 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def broadcast(x, num_times):
+    """Given an element, broadcast it number of times and return a list.
+    If it is already a list, only the first element will be copied.
+
+    Args:
+      x: input.
+      num_times (int): how many times to copy the element.
+
+    Returns list of length num_times.
+    """
+    x_list = make_list(x)
+    if len(x_list) == num_times:
+        return x_list
+    return x_list[:1] * num_times
+
+
 def get_args(func):
     """Get function's arguments.
 
@@ -41,11 +57,11 @@ def compute_params(model):
     return sum([p.numel() for p in model.parameters()])
 
 
-def create_optim(enc, parameters, **kwargs):
+def create_optim(optim_type, parameters, **kwargs):
     """Initialise optimisers.
 
     Args:
-      enc (string): type of optimiser - either 'SGD' or 'Adam'.
+      optim_type (string): type of optimiser - either 'SGD' or 'Adam'.
       parameters (iterable): parameters to be optimised.
 
     Returns:
@@ -55,14 +71,14 @@ def create_optim(enc, parameters, **kwargs):
       ValueError if enc is not either of 'SGD' or 'Adam'.
 
     """
-    if enc == "SGD":
+    if optim_type.lower() == "sgd":
         optim = torch.optim.SGD
-    elif enc == "Adam":
+    elif optim_type.lower() == "adam":
         optim = torch.optim.Adam
     else:
         raise ValueError(
             "Optim {} is not supported. "
-            "Only supports 'SGD' and 'Adam' for now.".format(enc)
+            "Only supports 'SGD' and 'Adam' for now.".format(optim_type)
         )
     args = get_args(optim)
     kwargs = {key: kwargs[key] for key in args if key in kwargs}
@@ -204,8 +220,8 @@ class Saver:
         ]
         return self.save_several_mode(do_save)
 
-    def save(self, new_val, dict_to_save):
-        """Save new checkpoint"""
+    def maybe_save(self, new_val, dict_to_save):
+        """Maybe save new checkpoint"""
         self._counter += 1
         if "epoch" not in dict_to_save:
             dict_to_save["epoch"] = self._counter

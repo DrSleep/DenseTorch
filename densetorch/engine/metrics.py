@@ -15,9 +15,17 @@ class MeanIoU:
     """
 
     def __init__(self, num_classes):
-        self.cm = np.zeros((num_classes, num_classes), dtype=int)
+        if isinstance(num_classes, (list, tuple)):
+            num_classes = num_classes[0]
+        assert isinstance(
+            num_classes, int
+        ), f"Number of classes must be int, got {num_classes}"
         self.num_classes = num_classes
         self.name = "meaniou"
+        self.reset()
+
+    def reset(self):
+        self.cm = np.zeros((self.num_classes, self.num_classes), dtype=int)
 
     def update(self, pred, gt):
         idx = gt < self.num_classes
@@ -59,9 +67,12 @@ class RMSE:
 
     def __init__(self, ignore_val=0):
         self.ignore_val = ignore_val
+        self.name = "rmse"
+        self.reset()
+
+    def reset(self):
         self.num = 0.0
         self.den = 0.0
-        self.name = "rmse"
 
     def update(self, pred, gt):
         assert (

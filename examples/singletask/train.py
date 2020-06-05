@@ -85,6 +85,6 @@ for i in range(start_epoch, n_epochs):
         model1.eval()
         with torch.no_grad():
             vals = dt.engine.validate(model1, metrics, valloader)
-        saver.save(
+        saver.maybe_save(
             new_val=vals, dict_to_save={"state_dict": model1.state_dict(), "epoch": i}
         )

@@ -1,10 +1,11 @@
+import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
 from ..misc.utils import AverageMeter, make_list
 
 
-def train(model, opts, crits, dataloader, loss_coeffs):
+def train(model, opts, crits, dataloader, loss_coeffs=(1.0,)):
     """Full Training Pipeline.
 
     Supports multiple optimisers, multiple criteria, \
@@ -27,6 +28,7 @@ def train(model, opts, crits, dataloader, loss_coeffs):
         loss_coeffs : list of coefficients for each loss term.
 
     """
+    device = next(model.parameters()).device
     opts = make_list(opts)
     crits = make_list(crits)
     loss_coeffs = make_list(loss_coeffs)
@@ -35,8 +37,8 @@ def train(model, opts, crits, dataloader, loss_coeffs):
 
     for sample in pbar:
         loss = 0.0
-        input = sample["image"].float().cuda()
-        targets = [sample[k].cuda() for k in dataloader.dataset.masks_names]
+        input = sample["image"].float().to(device)
+        targets = [sample[k].to(device) for k in dataloader.dataset.masks_names]
         outputs = model(input)
         outputs = make_list(outputs)
         for out, target, crit, loss_coeff in zip(outputs, targets, crits, loss_coeffs):
@@ -73,13 +75,14 @@ def trainbal(model, dataloader):
                      >= 1 optional keys.
 
     """
+    device = next(model.parameters()).device
     loss_meter = AverageMeter()
     pbar = tqdm(dataloader)
 
     for sample in pbar:
         loss = 0.0
-        input = sample["image"].float().cuda()
-        targets = [sample[k].cuda() for k in dataloader.dataset.masks_names]
+        input = sample["image"].float().to(device)
+        targets = [sample[k].to(device) for k in dataloader.dataset.masks_names]
         loss = model(input, targets)
         loss_meter.update(loss.item())
         pbar.set_description(
@@ -106,8 +109,12 @@ def validate(model, metrics, dataloader):
                      >= 1 optional keys.
 
     """
+    device = next(model.parameters()).device
     model.eval()
     metrics = make_list(metrics)
+    for metric in metrics:
+        metric.reset()
+
     pbar = tqdm(dataloader)
 
     def get_val(metrics):
@@ -116,24 +123,25 @@ def validate(model, metrics, dataloader):
         out = ["{} : {:4f}".format(name, val) for name, val in results]
         return vals, " | ".join(out)
 
-    for sample in pbar:
-        input = sample["image"].float().cuda()
-        targets = [
-            sample[k].squeeze(dim=1).numpy() for k in dataloader.dataset.masks_names
-        ]
-        outputs = model(input)
-        outputs = make_list(outputs)
-        for out, target, metric in zip(outputs, targets, metrics):
-            metric.update(
-                F.interpolate(
-                    out, size=target.shape[1:], mode="bilinear", align_corners=False
+    with torch.no_grad():
+        for sample in pbar:
+            input = sample["image"].float().to(device)
+            targets = [
+                sample[k].squeeze(dim=1).numpy() for k in dataloader.dataset.masks_names
+            ]
+            outputs = model(input)
+            outputs = make_list(outputs)
+            for out, target, metric in zip(outputs, targets, metrics):
+                metric.update(
+                    F.interpolate(
+                        out, size=target.shape[1:], mode="bilinear", align_corners=False
+                    )
+                    .squeeze(dim=1)
+                    .cpu()
+                    .numpy(),
+                    target,
                 )
-                .squeeze(dim=1)
-                .cpu()
-                .numpy(),
-                target,
-            )
-        pbar.set_description(get_val(metrics)[1])
+            pbar.set_description(get_val(metrics)[1])
     vals, _ = get_val(metrics)
     print("----" * 5)
     return vals

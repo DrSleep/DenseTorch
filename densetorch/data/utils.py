@@ -1,10 +1,11 @@
 import cv2
 import numpy as np
 import torch
+from torch.utils.data import DataLoader
 
 from albumentations import Compose
 
-from ..misc.utils import make_list
+from ..misc.utils import broadcast, make_list
 
 # Usual dtypes for common modalities
 KEYS_TO_DTYPES = {
@@ -235,3 +236,42 @@ def denormalise(tensor_bchw, scale, mean_c, std_c):
         torch.from_numpy(std_c[None, :, None, None]).float().to(tensor_bchw.device)
     )
     return (tensor_bchw * std_bchw + mean_bchw) / scale
+
+
+def get_loaders(
+    train_batch_size,
+    val_batch_size,
+    train_set,
+    val_set,
+    num_stages=1,
+    num_workers=8,
+    train_shuffle=True,
+    val_shuffle=False,
+    train_pin_memory=False,
+    val_pin_memory=False,
+    train_drop_last=False,
+    val_drop_last=False,
+):
+    """Create train and val loaders"""
+    train_batch_sizes = broadcast(train_batch_size, num_stages)
+    train_sets = broadcast(train_set, num_stages)
+    train_loaders = [
+        DataLoader(
+            train_sets[i],
+            batch_size=train_batch_sizes[i],
+            shuffle=train_shuffle,
+            num_workers=num_workers,
+            pin_memory=train_pin_memory,
+            drop_last=train_drop_last,
+        )
+        for i in range(num_stages)
+    ]
+    val_loader = DataLoader(
+        val_set,
+        batch_size=val_batch_size,
+        shuffle=val_shuffle,
+        num_workers=num_workers,
+        pin_memory=val_pin_memory,
+        drop_last=val_drop_last,
+    )
+    return train_loaders, val_loader
