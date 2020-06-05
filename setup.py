@@ -1,11 +1,18 @@
+import os
 from setuptools import Extension, find_packages, setup
+
+cwd = os.path.dirname(os.path.abspath(__file__))
+version = "0.0.2"
+
+with open(os.path.join(cwd, "densetorch", "version.py"), "w") as f:
+    f.write(f"__version__ = '{version}'\n")
 
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 setup(
     name="densetorch",
-    version="0.0.1",
+    version=version,
     author="Vladimir Nekrasov",
     author_email="nekrasowladimir.at.gmail.com",
     description="Light-Weight PyTorch Wrapper for dense per-pixel tasks.",
