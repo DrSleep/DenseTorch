@@ -6,14 +6,24 @@ from tqdm import tqdm
 from ..misc.utils import AverageMeter, make_list
 
 
+def maybe_cast_target_to_long(target):
+    """Torch losses usually work on Long types"""
+    if target.dtype == torch.uint8:
+        return target.to(torch.long)
+    return target
+
+
 def get_input_and_targets(sample, dataloader, device):
     if isinstance(sample, dict):
         input = sample["image"].float().to(device)
-        targets = [sample[k].to(device) for k in dataloader.dataset.masks_names]
+        targets = [
+            maybe_cast_target_to_long(sample[k].to(device))
+            for k in dataloader.dataset.masks_names
+        ]
     elif isinstance(sample, (tuple, list)):
         input, *targets = sample
         input = input.float().to(device)
-        targets = [target.to(device) for target in targets]
+        targets = [maybe_cast_target_to_long(target.to(device)) for target in targets]
     else:
         raise Exception(f"Sample type {type(sample)} is not supported.")
     return input, targets
