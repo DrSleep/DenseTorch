@@ -254,7 +254,7 @@ class Saver:
         Returns the epoch at which the checkpoint was saved.
         """
         keys_to_load = make_list(keys_to_load)
-        if not os.path.exists(ckpt_path):
+        if not os.path.isfile(ckpt_path):
             return [None] * len(keys_to_load)
         ckpt = torch.load(ckpt_path)
         loaded = []

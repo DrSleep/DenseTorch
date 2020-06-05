@@ -6,6 +6,19 @@ from tqdm import tqdm
 from ..misc.utils import AverageMeter, make_list
 
 
+def get_input_and_targets(sample, dataloader, device):
+    if isinstance(sample, dict):
+        input = sample["image"].float().to(device)
+        targets = [sample[k].to(device) for k in dataloader.dataset.masks_names]
+    elif isinstance(sample, (tuple, list)):
+        input, *targets = sample
+        input = input.float().to(device)
+        targets = [target.to(device) for target in targets]
+    else:
+        raise Exception(f"Sample type {type(sample)} is not supported.")
+    return input, targets
+
+
 def train(model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False):
     """Full Training Pipeline.
 
@@ -44,8 +57,9 @@ def train(model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False):
 
     for sample in pbar:
         loss = 0.0
-        input = sample["image"].float().to(device)
-        targets = [sample[k].to(device) for k in dataloader.dataset.masks_names]
+        input, targets = get_input_and_targets(
+            sample=sample, dataloader=dataloader, device=device
+        )
         outputs = model(input)
         outputs = make_list(outputs)
         for out, target, crit, loss_coeff in zip(outputs, targets, crits, loss_coeffs):
@@ -88,8 +102,9 @@ def trainbal(model, dataloader):
 
     for sample in pbar:
         loss = 0.0
-        input = sample["image"].float().to(device)
-        targets = [sample[k].to(device) for k in dataloader.dataset.masks_names]
+        input, targets = get_input_and_targets(
+            sample=sample, dataloader=dataloader, device=device
+        )
         loss = model(input, targets)
         loss_meter.update(loss.item())
         pbar.set_description(
@@ -132,10 +147,10 @@ def validate(model, metrics, dataloader):
 
     with torch.no_grad():
         for sample in pbar:
-            input = sample["image"].float().to(device)
-            targets = [
-                sample[k].squeeze(dim=1).numpy() for k in dataloader.dataset.masks_names
-            ]
+            input, targets = get_input_and_targets(
+                sample=sample, dataloader=dataloader, device=device
+            )
+            targets = [target.squeeze(dim=1).cpu().numpy() for target in targets]
             outputs = model(input)
             outputs = make_list(outputs)
             for out, target, metric in zip(outputs, targets, metrics):
