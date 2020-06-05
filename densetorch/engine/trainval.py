@@ -1,11 +1,12 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
 
 from ..misc.utils import AverageMeter, make_list
 
 
-def train(model, opts, crits, dataloader, loss_coeffs=(1.0,)):
+def train(model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False):
     """Full Training Pipeline.
 
     Supports multiple optimisers, multiple criteria, \
@@ -26,8 +27,14 @@ def train(model, opts, crits, dataloader, loss_coeffs=(1.0,)):
                      Each sample must contain `image` key and
                      >= 1 optional keys.
         loss_coeffs : list of coefficients for each loss term.
+        freeze_bn: whether to freeze batch norm parameters in the module.
 
     """
+    model.train()
+    if freeze_bn:
+        for m in model.modules():
+            if isinstance(m, nn.BatchNorm2d):
+                m.eval()
     device = next(model.parameters()).device
     opts = make_list(opts)
     crits = make_list(crits)
