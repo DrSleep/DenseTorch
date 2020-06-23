@@ -1,5 +1,9 @@
 import os
-from setuptools import Extension, find_packages, setup
+from setuptools import Extension, find_packages, setup, dist
+
+dist.Distribution().fetch_build_eggs(["Cython>=0.29.1", "numpy>=1.15.1"])
+
+import numpy  # noqa: E402
 
 cwd = os.path.dirname(os.path.abspath(__file__))
 version = "0.0.2"
@@ -18,7 +22,7 @@ setup(
     description="Light-Weight PyTorch Wrapper for dense per-pixel tasks.",
     url="https://github.com/drsleep/densetorch",
     packages=find_packages(exclude=("examples/",)),
-    setup_requires=["setuptools>=18.0", "cython"],
+    include_dirs=[numpy.get_include()],
     install_requires=requirements,
     ext_modules=[
         Extension("densetorch.engine.miou", sources=["./densetorch/engine/miou.pyx"])
