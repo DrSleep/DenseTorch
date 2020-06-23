@@ -293,7 +293,7 @@ class Saver:
             return False
         return False
 
-    def load(self, ckpt_path, keys_to_load):
+    def maybe_load(self, ckpt_path, keys_to_load):
         """Loads existing checkpoint if exists.
 
         Args:

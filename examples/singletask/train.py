@@ -48,7 +48,7 @@ enc = dt.nn.xception65(pretrained=pretrained, return_idx=return_idx)
 dec = dt.nn.DLv3plus(enc._out_c, num_classes, rates=enc.rates)
 model1 = nn.DataParallel(nn.Sequential(enc, dec).cuda())
 print("Model has {} parameters".format(dt.misc.compute_params(model1)))
-start_epoch, _, state_dict = saver.load(
+start_epoch, _, state_dict = saver.maybe_load(
     ckpt_path=ckpt_path, keys_to_load=["epoch", "best_val", "state_dict"],
 )
 dt.misc.load_state_dict(model1, state_dict)
