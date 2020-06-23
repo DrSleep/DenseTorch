@@ -29,7 +29,9 @@ def get_input_and_targets(sample, dataloader, device):
     return input, targets
 
 
-def train(model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False):
+def train(
+    model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False, grad_norm=0.0
+):
     """Full Training Pipeline.
 
     Supports multiple optimisers, multiple criteria, \
@@ -51,6 +53,7 @@ def train(model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False):
                      >= 1 optional keys.
         loss_coeffs : list of coefficients for each loss term.
         freeze_bn: whether to freeze batch norm parameters in the module.
+        grad_norm: if > 0, clip gradients' norm to this value.
 
     """
     model.train()
@@ -82,6 +85,8 @@ def train(model, opts, crits, dataloader, loss_coeffs=(1.0,), freeze_bn=False):
         for opt in opts:
             opt.zero_grad()
         loss.backward()
+        if grad_norm > 0.0:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_norm)
         for opt in opts:
             opt.step()
 
