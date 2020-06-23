@@ -68,7 +68,7 @@ def create_optim(optim_type, parameters, **kwargs):
       An instance of torch.optim.
 
     Raises:
-      ValueError if enc is not either of 'SGD' or 'Adam'.
+      ValueError if optim_type is not either of 'SGD' or 'Adam'.
 
     """
     if optim_type.lower() == "sgd":
@@ -83,6 +83,37 @@ def create_optim(optim_type, parameters, **kwargs):
     args = get_args(optim)
     kwargs = {key: kwargs[key] for key in args if key in kwargs}
     return optim(parameters, **kwargs)
+
+
+def create_scheduler(scheduler_type, optim, **kwargs):
+    """Initialise schedulers.
+
+    Args:
+      scheduler_type (string): type of scheduler -- either 'poly' or 'multistep'.
+      optim (torch.optim): optimiser to which the scheduler will be applied to.
+
+    Returns:
+      An instance of torch.optim.lr_scheduler
+
+    Raises:
+      ValueError if scheduler_type is not either of 'poly' or 'multistep'.
+
+    """
+    if scheduler_type.lower() == "poly":
+        scheduler = torch.optim.lr_scheduler.LambdaLR
+        lr_lambda_args = get_args(polyschedule)
+        lr_lambda_kwargs = {key: kwargs[key] for key in lr_lambda_args if key in kwargs}
+        kwargs["lr_lambda"] = polyschedule(**lr_lambda_kwargs)
+    elif scheduler_type.lower() == "multistep":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR
+    else:
+        raise ValueError(
+            "Scheduler {} is not supported. "
+            "Only supports 'poly' and 'multistep' for now.".format(scheduler_type)
+        )
+    args = get_args(scheduler)
+    kwargs = {key: kwargs[key] for key in args if key in kwargs}
+    return scheduler(optim, **kwargs)
 
 
 def ctime():
@@ -131,6 +162,24 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
     random.seed(seed)
+
+
+def polyschedule(max_epochs, gamma=0.9):
+    """Poly-learning rate policy popularised by DeepLab-v2: https://arxiv.org/abs/1606.00915
+
+    Args:
+      max_epochs (int): maximum number of epochs, at which the multiplier becomes zero.
+      gamma (float): decay factor.
+
+    Returns:
+      Callable that takes the current epoch as an argument and returns the learning rate multiplier.
+
+    """
+
+    def polypolicy(epoch):
+        return (1.0 - 1.0 * epoch / max_epochs) ** gamma
+
+    return polypolicy
 
 
 class AverageMeter:
