@@ -18,7 +18,7 @@ Code Documentation
 ===================
 
 densetorch.nn
-------------
+-------------
 
 The `nn` module implements a range of well-established encoders and decoders.
 
@@ -33,7 +33,7 @@ The `nn` module implements a range of well-established encoders and decoders.
 
 
 densetorch.engine
-------------
+-----------------
 
 The `engine` module contains metrics and losses typically used for the tasks of semantic segmentation and depth estimation.
 Also contains training and validation functions.
@@ -46,7 +46,7 @@ Also contains training and validation functions.
     :members:
 
 densetorch.data
-------------
+---------------
 
 The `data` module implements datasets and relevant utilities used for data pre-processing. It supports multi-modal data.
 
@@ -58,7 +58,7 @@ The `data` module implements datasets and relevant utilities used for data pre-p
 
 
 densetorch.misc
------------
+---------------
 
 The `misc` module has various useful utilities.
 
