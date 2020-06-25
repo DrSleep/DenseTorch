@@ -7,3 +7,6 @@ torchvision>=0.2.1
 albumentations>=0.4.5
 tqdm>=4.28.1
 scikit-image>=0.15.0
+pytest-depends>=1.0.1
+pytest-mock>=3.1.1
+pytest-repeat>=0.8.0

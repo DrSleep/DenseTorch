@@ -38,7 +38,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self._out_c = [
-            out_c for idx, out_c in enumerate(self._out_c) if idx in return_idx
+            out_c for idx, out_c in enumerate(self._out_c) if idx in self.return_idx
         ]
 
     def _make_layer(self, block, planes, blocks, stride=1):

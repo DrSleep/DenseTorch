@@ -24,7 +24,13 @@ class DLv3plus(nn.Module):
     """
 
     def __init__(
-        self, input_sizes, num_classes, skip_size=48, agg_size=256, rates=(6, 12, 18)
+        self,
+        input_sizes,
+        num_classes,
+        skip_size=48,
+        agg_size=256,
+        rates=(6, 12, 18),
+        **kwargs,
     ):
         super(DLv3plus, self).__init__()
 
@@ -92,13 +98,16 @@ class DLv3plus(nn.Module):
         # Apply last conv in ASPP
         aspp = self.aspp[-1](aspp)
         # Connect with skip-connections
-        dec = [skips[0]]
-        for x in skips[1:] + [aspp]:
-            dec.append(
-                F.interpolate(
-                    x, size=dec[0].size()[2:], mode="bilinear", align_corners=True
+        if skips:
+            dec = [skips[0]]
+            for x in skips[1:] + [aspp]:
+                dec.append(
+                    F.interpolate(
+                        x, size=dec[0].size()[2:], mode="bilinear", align_corners=True
+                    )
                 )
-            )
+        else:
+            dec = [aspp]
         dec = torch.cat(dec, dim=1)
         dec = self.dec(dec)
         out = self.clf(dec)
@@ -175,7 +184,7 @@ class LWRefineNet(nn.Module):
         return out_segm
 
     @staticmethod
-    def make_crp(in_planes, out_planes, stages):
+    def _make_crp(in_planes, out_planes, stages):
         """Creating Light-Weight Chained Residual Pooling (CRP) block.
 
         Args:
@@ -220,7 +229,7 @@ class MTLWRefineNet(nn.Module):
         input_sizes = list(reversed(input_sizes))
         # No reverse for collapse indices is needed
         self.collapse_ind = make_list(collapse_ind)
-        groups = [False] * len(collapse_ind)
+        groups = [False] * len(self.collapse_ind)
         groups[-1] = True
 
         for size in input_sizes:

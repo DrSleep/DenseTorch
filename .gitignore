@@ -3,6 +3,7 @@
 *.cpython*
 *.pth.tar
 *.log
+*.coverage
 
 build/
 /dist/
