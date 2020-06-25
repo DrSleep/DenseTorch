@@ -5,12 +5,12 @@
 
 :github_url: https://github.com/drsleep/densetorch
 
-.. mdinclude:: ../../README.md
+.. mdinclude:: ../README.md
 
-.. mdinclude:: ../../examples/multitask/README.md
+.. mdinclude:: ../examples/multitask/README.md
 
 
-.. mdinclude:: ../../examples/singletask/README.md
+.. mdinclude:: ../examples/singletask/README.md
 
 
 
@@ -35,7 +35,7 @@ The `nn` module implements a range of well-established encoders and decoders.
 densetorch.engine
 ------------
 
-The `engine` module contains metrics and losses typically used for tasks of semantic segmenation and depth estimation.
+The `engine` module contains metrics and losses typically used for the tasks of semantic segmentation and depth estimation.
 Also contains training and validation functions.
 
 .. automodule:: densetorch.engine.losses
