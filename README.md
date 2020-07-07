@@ -1,6 +1,8 @@
 # DenseTorch: PyTorch Wrapper for Smooth Workflow with Dense Per-Pixel Tasks
 
 [![Build Status](https://api.travis-ci.com/DrSleep/DenseTorch.svg?branch=master)](https://travis-ci.com/DrSleep/DenseTorch)
+[![Docs Status](https://readthedocs.org/projects/densetorch/badge/?version=latest)](https://densetorch.readthedocs.io/en/latest/)
+
 
 This library aims to ease typical workflows involving dense per-pixel tasks in PyTorch. The progress in such tasks as semantic image segmentation and depth estimation have been significant over the last years, and in this library we provide an easy-to-setup environment for experimenting with given (or your own) models that reliably solve these tasks.
 
@@ -37,7 +39,7 @@ Contributions are welcome.
 
 ## Documentation
 
-Is available [here](https://drsleep.github.io/DenseTorch/).
+Is available [here](https://densetorch.readthedocs.io/en/latest/).
 
 ## Citation
 
