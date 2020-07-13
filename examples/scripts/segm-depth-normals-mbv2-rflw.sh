@@ -18,3 +18,6 @@ python src/train.py \
     --dec-lr 1e-2 \
     --ckpt-dir "./checkpoints-mbv2-sdn/" \
     --ckpt-path "./checkpoint.pth.tar2" \
+    --freeze-bn 0 \
+    --high-scale 1.2 \
+    --low-scale 0.8
