@@ -7,6 +7,12 @@ from torch.utils.data import Dataset
 from .utils import KEYS_TO_DTYPES
 
 
+def transpose_normals(normals):
+    # Transpose normals: HxWxC -> CxHxW
+    normals = normals.permute(2, 0, 1)
+    return normals
+
+
 def convert_normals_to_xzy(normals):
     normals = normals / 255.0
     normals[:, :, 0] = normals[:, :, 0] * 2.0 - 1.0  # x
@@ -20,8 +26,6 @@ def set_normals_ignore_indices(
 ):
     depth_ignore_region = depth == depth_ignore_index
     normals[depth_ignore_region] = normals_ignore_index
-    # Transpose normals: HxWxC -> CxHxW
-    normals = normals.permute(2, 0, 1)
     return normals
 
 
@@ -111,12 +115,16 @@ class MMDataset(Dataset):
             normals_ignore_index = self.ignore_indices[
                 self.masks_names.index("normals")
             ]
-            sample["normals"] = set_normals_ignore_indices(
-                sample["normals"],
-                sample["depth"],
-                normals_ignore_index,
-                depth_ignore_index,
+            sample["normals"] = transpose_normals(
+                set_normals_ignore_indices(
+                    sample["normals"],
+                    sample["depth"],
+                    normals_ignore_index,
+                    depth_ignore_index,
+                )
             )
+        elif "normals" in self.masks_names:
+            sample["normals"] = transpose_normals(sample["normals"])
         return sample
 
     @staticmethod
