@@ -25,18 +25,20 @@ class Pad(object):
     """
 
     def __init__(self, size, img_val, msk_vals):
-        assert isinstance(size, int)
-        self.size = size
-        self.img_val = img_val
+        self.hw_size = broadcast(size, 2)
+        self.img_val = broadcast(img_val, 3)
         self.msk_vals = make_list(msk_vals)
 
     def __call__(self, sample):
         image = sample["image"]
         msk_keys = sample["names"]
         h, w = image.shape[:2]
-        h_pad = int(np.clip(((self.size - h) + 1) // 2, 0, 1e6))
-        w_pad = int(np.clip(((self.size - w) + 1) // 2, 0, 1e6))
-        pad = ((h_pad, h_pad), (w_pad, w_pad))
+        h_pad, w_pad = max(self.hw_size[0] - h, 0), max(self.hw_size[1] - w, 0)
+        top_pad = h_pad // 2
+        bottom_pad = h_pad - top_pad
+        left_pad = w_pad // 2
+        right_pad = w_pad - left_pad
+        pad = ((top_pad, bottom_pad), (left_pad, right_pad))
         sample["image"] = np.stack(
             [
                 np.pad(
