@@ -3,6 +3,18 @@ import numpy as np
 from .miou import compute_iu, fast_cm
 
 
+def maybe_transpose_bchw_to_bhwc(x, c=None):
+    if c is None:
+        return x.transpose(0, 2, 3, 1)
+    if x.shape[3] == c:
+        return x
+    else:
+        assert (
+            x.shape[1] == c
+        ), f"Either the last or the second dimension must be equal to {c}, got shape {x.shape}"
+        return x.transpose(0, 2, 3, 1)
+
+
 class MeanIoU:
     """Mean-IoU computational block for semantic segmentation.
 
@@ -57,7 +69,7 @@ class RMSE:
     """Root Mean Squared Error computational block for depth estimation.
 
     Args:
-      ignore_val (float): value to ignore in the target
+      ignore_index (float): value to ignore in the target
                           when computing the metric.
 
     Attributes:
@@ -65,8 +77,8 @@ class RMSE:
 
     """
 
-    def __init__(self, ignore_val=0):
-        self.ignore_val = ignore_val
+    def __init__(self, ignore_index=0):
+        self.ignore_index = ignore_index
         self.name = "rmse"
         self.reset()
 
@@ -79,10 +91,58 @@ class RMSE:
             pred.shape == gt.shape
         ), "Prediction tensor must have the same shape as ground truth"
         pred = np.abs(pred)
-        idx = gt != self.ignore_val
+        idx = gt != self.ignore_index
         diff = (pred - gt)[idx]
         self.num += np.sum(diff ** 2)
         self.den += np.sum(idx)
 
     def val(self):
         return np.sqrt(self.num / self.den)
+
+
+class AngularError:
+    """AngularError computational block for 3D surface normals estimation.
+
+    Args:
+      ignore_index (float): value to ignore in the target
+                          when computing the metric.
+
+    Attributes:
+      name (str): descriptor of the estimator.
+
+    """
+
+    def __init__(self, ignore_index=0):
+        self.ignore_index = ignore_index
+        self.name = "ang_error"
+        self.reset()
+
+    def reset(self):
+        self.num = 0.0
+        self.den = 0.0
+
+    def update(self, pred, gt):
+        assert len(pred.shape) == len(
+            gt.shape
+        ), f"Prediction tensor and ground truth must have the same number of dimension, got {len(pred.shape):d} and {len(gt.shape):d}"
+        if len(pred.shape) != 4:
+            assert (
+                len(pred.shape) == 3
+            ), f"Prediction tensor must have either 3 or 4 dimensions, got {len(pred.shape):d}"
+            pred = np.expand_dims(pred, axis=0)
+            gt = np.expand_dims(gt, axis=0)
+        gt = maybe_transpose_bchw_to_bhwc(gt, c=3)
+        pred = maybe_transpose_bchw_to_bhwc(pred, c=3)
+        keep_region = gt.sum(axis=-1) != 3 * self.ignore_index
+        gt_N3 = gt[keep_region]
+        pred_N3 = pred[keep_region]
+        cos_theta = np.sum(gt_N3 * pred_N3, axis=-1) / (
+            np.linalg.norm(gt_N3, axis=-1) * np.linalg.norm(pred_N3, axis=-1)
+        )
+        cos_theta = np.clip(cos_theta, -1, 1)
+        theta = np.arccos(cos_theta)
+        self.num += np.sum(theta)
+        self.den += len(theta)
+
+    def val(self):
+        return (self.num / self.den) / np.pi * 180.0

@@ -78,7 +78,7 @@ def train(
         for out, target, crit, loss_coeff in zip(outputs, targets, crits, loss_coeffs):
             loss += loss_coeff * crit(
                 F.interpolate(
-                    out, size=target.size()[1:], mode="bilinear", align_corners=False
+                    out, size=target.size()[-2:], mode="bilinear", align_corners=False
                 ).squeeze(dim=1),
                 target.squeeze(dim=1),
             )
@@ -171,7 +171,10 @@ def validate(model, metrics, dataloader):
             for out, target, metric in zip(outputs, targets, metrics):
                 metric.update(
                     F.interpolate(
-                        out, size=target.shape[1:], mode="bilinear", align_corners=False
+                        out,
+                        size=target.shape[-2:],
+                        mode="bilinear",
+                        align_corners=False,
                     )
                     .squeeze(dim=1)
                     .cpu()
