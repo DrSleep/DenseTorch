@@ -172,6 +172,13 @@ def get_arguments():
         default="./checkpoints/checkpoint.pth.tar",
         help="Path to the checkpoint file.",
     )
+    parser.add_argument(
+        "--save-several-mode",
+        type=str,
+        choices=["any", "all"],
+        default="any",
+        help="When there are multiple tasks, how to decide when to save the checkpoint? With `any`, an increase in any task triggers the saving; with `all` the saving happens only when all the tasks have improved over their last saved value.",
+    )
 
     # Arguments broadcastable across training stages
     stage_parser = parser.add_argument_group("stage-parser")

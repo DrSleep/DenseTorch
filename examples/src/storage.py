@@ -3,6 +3,15 @@ import numpy as np
 import densetorch as dt
 
 
+def parse_save_several_mode(mode):
+    if mode == "any":
+        return any
+    elif mode == "all":
+        return all
+    else:
+        raise ValueError(f"Invalid mode = {mode}, only 'any' and 'all' are supported")
+
+
 def parse_saving_criterions(saving_criterions):
     def parse_saving_criterion(saving_criterion):
         if saving_criterion == "up":
@@ -22,6 +31,7 @@ def setup_checkpoint_and_maybe_restore(args, model, optimisers, schedulers):
         ckpt_dir=args.ckpt_dir,
         best_val=args.initial_values,
         condition=parse_saving_criterions(args.saving_criterions),
+        save_several_mode=parse_save_several_mode(args.save_several_mode),
     )
     (
         restart_epoch,
