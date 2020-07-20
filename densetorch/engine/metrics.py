@@ -1,19 +1,20 @@
 import numpy as np
 import torch
+import torch.nn.functional as F
 
 from .miou import compute_iu, fast_cm
 
 
 def maybe_transpose_bchw_to_bhwc(x, c=None):
     if c is None:
-        return x.transpose(0, 2, 3, 1)
+        return x.permute(0, 2, 3, 1)
     if x.shape[3] == c:
         return x
     else:
         assert (
             x.shape[1] == c
         ), f"Either the last or the second dimension must be equal to {c}, got shape {x.shape}"
-        return x.transpose(0, 2, 3, 1)
+        return x.permute(0, 2, 3, 1)
 
 
 class MeanIoU:
@@ -129,26 +130,25 @@ class AngularError:
         self.den = 0.0
 
     def update(self, pred, gt):
+        assert isinstance(pred, torch.Tensor), "Expected a torch.Tensor as input"
+        assert isinstance(gt, torch.Tensor), "Expected a torch.Tensor as input"
         assert len(pred.shape) == len(
             gt.shape
-        ), f"Prediction tensor and ground truth must have the same number of dimension, got {len(pred.shape):d} and {len(gt.shape):d}"
+        ), f"Prediction tensor and ground truth must have the same number of dimensions, got {len(pred.shape):d} and {len(gt.shape):d}"
         if len(pred.shape) != 4:
             assert (
                 len(pred.shape) == 3
             ), f"Prediction tensor must have either 3 or 4 dimensions, got {len(pred.shape):d}"
-            pred = np.expand_dims(pred, axis=0)
-            gt = np.expand_dims(gt, axis=0)
+            pred = pred.unsqueeze(dim=0)
+            gt = pred.unsqueeze(dim=0)
         gt = maybe_transpose_bchw_to_bhwc(gt, c=3)
         pred = maybe_transpose_bchw_to_bhwc(pred, c=3)
-        keep_region = gt.sum(axis=-1) != 3 * self.ignore_index
+        keep_region = gt.sum(-1) != 3 * self.ignore_index
         gt_N3 = gt[keep_region]
         pred_N3 = pred[keep_region]
-        cos_theta = np.sum(gt_N3 * pred_N3, axis=-1) / (
-            np.linalg.norm(gt_N3, axis=-1) * np.linalg.norm(pred_N3, axis=-1)
-        )
-        cos_theta = np.clip(cos_theta, -1, 1)
-        theta = np.arccos(cos_theta)
-        self.num += np.sum(theta)
+        cos_theta = F.cosine_similarity(gt_N3, pred_N3, dim=-1).clamp(-1, 1)
+        theta = cos_theta.acos()
+        self.num += torch.sum(theta).item()
         self.den += len(theta)
 
     def val(self):
