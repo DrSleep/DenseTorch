@@ -5,7 +5,7 @@ import torch
 
 import densetorch as dt
 
-from src.network import get_network
+from examples.src.network import get_network
 
 
 def get_dummy_input_tensor(height, width, channels=3, batch=4):
@@ -51,7 +51,7 @@ def input_width():
 )
 @pytest.mark.parametrize("enc_pretrained", [False, True])
 @pytest.mark.parametrize("dec_backbone", ["lwrefinenet", "dlv3plus"])
-def test_networks(
+def test_get_network(
     enc_backbone, enc_pretrained, dec_backbone, input_height, input_width, num_classes
 ):
     device = "cuda" if torch.cuda.is_available() else "cpu"
