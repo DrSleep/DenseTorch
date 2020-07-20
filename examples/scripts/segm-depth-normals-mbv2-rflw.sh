@@ -1,3 +1,6 @@
+# Training Multi-Task Light-Weight-RefineNet with MobileNet-v2
+# on three tasks: segmentation, depth and surface normals estimation
+# using NYUDv2.
 python src/train.py \
     --tasks segm depth normals \
     --enc-backbone "mobilenetv2" \
@@ -19,5 +22,7 @@ python src/train.py \
     --ckpt-dir "./checkpoints-mbv2-sdn/" \
     --ckpt-path "./checkpoint.pth.tar2" \
     --freeze-bn 0 \
-    --high-scale 1.2 \
-    --low-scale 0.8
+    --high-scale 1.0 \
+    --low-scale -0.2 \
+    --crop-size 512
+    # Albumentations scale is very dangerous as it adds bias of +1.0 for tuples....

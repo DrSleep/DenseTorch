@@ -18,20 +18,12 @@ def get_arguments():
     parser.add_argument("--img-std", type=float, nargs=3, default=(0.229, 0.224, 0.225))
     parser.add_argument("--depth-scale", type=float, default=5000.0)
 
-    # Training augmentations
-    parser.add_argument(
-        "--augmentations-type",
-        type=str,
-        choices=["densetorch", "albumentations"],
-        default="densetorch",
-    )
-
     # Dataset
     parser.add_argument(
-        "--val-list-path", type=str, default="./data/val.nyu",
+        "--val-list-path", type=str, default="./data/val_list3.txt",
     )
     parser.add_argument(
-        "--val-dir", type=str, default="./datasets/nyud/",
+        "--val-dir", type=str, default="./datasets/nyudv2/",
     )
     parser.add_argument("--val-batch-size", type=int, default=1)
 
@@ -84,12 +76,6 @@ def get_arguments():
         choices=["poly", "multistep"],
         default="multistep",
     )
-    parser.add_argument(
-        "--ignore-label",
-        type=int,
-        default=255,
-        help="Ignore this label in the training loss.",
-    )
     parser.add_argument("--random-seed", type=int, default=42)
 
     # Architecture setup
@@ -105,14 +91,14 @@ def get_arguments():
             "resnet152",
             "mobilenetv2",
         ],
-        default="resnet50",
+        default="mobilenetv2",
     )
     parser.add_argument("--enc-pretrained", type=int, choices=[0, 1], default=1)
     parser.add_argument(
         "--enc-return-layers",
         type=int,
         nargs="+",
-        default=[0, 1, 2, 3],
+        default=[1, 2, 3, 4, 5, 6],
         help="Indices of layers to return from the encoder. Usually, each index corresponds to a layer with a different resolution.",
     )
     parser.add_argument(
@@ -124,7 +110,7 @@ def get_arguments():
     parser.add_argument(
         "--dec-combine-layers",
         type=str,
-        default="[0, 1, 2, 3]",
+        default="[[0, 1], [2, 3], 4, 5]",
         help="Comma-separated list of (lists of) indices of input layers to combine via element-wise summation in the decoder. Assumes that the corresponding layers are of the same size.",
     )
 
@@ -173,22 +159,9 @@ def get_arguments():
         "--num-stages",
         type=int,
         default=3,
-        help="Number of training stages. All other arguments with nargs='+' must "
+        help="Number of training stages. All other stage-specific arguments with nargs='+' must "
         "have the number of arguments equal to this value. Otherwise, the given "
         "arguments will be broadcasted to have the required length.",
-    )
-    parser.add_argument(
-        "--dataset-type",
-        type=str,
-        default="densetorch",
-        choices=["densetorch", "torchvision"],
-    )
-    parser.add_argument(
-        "--val-download",
-        type=int,
-        choices=[0, 1],
-        default=0,
-        help="Only used if dataset_type == torchvision.",
     )
 
     # Checkpointing configuration
@@ -215,10 +188,10 @@ def get_arguments():
         "--high-scale", type=float, nargs="+", default=(2.0, 2.0, 2.0,)
     )
     stage_parser.add_argument(
-        "--train-list-path", type=str, nargs="+", default=("./data/train.nyu",)
+        "--train-list-path", type=str, nargs="+", default=("./data/train_list3.txt",)
     )
     stage_parser.add_argument(
-        "--train-dir", type=str, nargs="+", default=("./datasets/nyud/",)
+        "--train-dir", type=str, nargs="+", default=("./datasets/nyudv2/",)
     )
     stage_parser.add_argument(
         "--train-batch-size", type=int, nargs="+", default=(6, 6, 6,)
@@ -230,22 +203,6 @@ def get_arguments():
         "--epochs-per-stage", type=int, nargs="+", default=(100, 100, 100),
     )
     stage_parser.add_argument("--val-every", type=int, nargs="+", default=(5, 5, 5,))
-    stage_parser.add_argument(
-        "--stage-names",
-        type=str,
-        nargs="+",
-        choices=["SBD", "VOC"],
-        default=("SBD", "VOC",),
-        help="Only used if dataset_type == torchvision.",
-    )
-    stage_parser.add_argument(
-        "--train-download",
-        type=int,
-        nargs="+",
-        choices=[0, 1],
-        default=(0, 0,),
-        help="Only used if dataset_type == torchvision.",
-    )
     stage_parser.add_argument(
         "--grad-norm",
         type=float,
