@@ -92,14 +92,16 @@ class RMSE:
         self.den = 0.0
 
     def update(self, pred, gt):
+        assert isinstance(pred, torch.Tensor), "Expected a torch.Tensor as input"
+        assert isinstance(gt, torch.Tensor), "Expected a torch.Tensor as input"
         assert (
             pred.shape == gt.shape
         ), "Prediction tensor must have the same shape as ground truth"
-        pred = np.abs(pred)
+        pred = pred.abs()
         idx = gt != self.ignore_index
         diff = (pred - gt)[idx]
-        self.num += np.sum(diff ** 2)
-        self.den += np.sum(idx)
+        self.num += (diff ** 2).sum().item()
+        self.den += idx.sum().item()
 
     def val(self):
         return np.sqrt(self.num / self.den)
