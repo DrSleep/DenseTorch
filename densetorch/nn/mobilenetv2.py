@@ -62,6 +62,10 @@ class MobileNetv2(nn.Module):
             c_layer += 1
         self._out_c = [self.mobilenet_config[idx][1] for idx in self.return_idx]
 
+    def info(self):
+        """Returns dictionary describing information required to create the decoder part."""
+        return {"input_sizes": self._out_c}
+
     def forward(self, x):
         outs = []
         x = self.layer1(x)

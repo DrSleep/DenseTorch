@@ -47,6 +47,10 @@ class Xception65(nn.Module):
             setattr(self, "layer{}".format(i + 1), self._make_layer(config[i]))
         self._out_c = [config[idx].filters[-1] for idx in self.return_idx]
 
+    def info(self):
+        """Returns dictionary describing information required to create the decoder part."""
+        return {"input_sizes": self._out_c, "rates": self.rates}
+
     def forward(self, x):
         y = self.entry_flow_conv1_1(x)
         y = self.entry_flow_conv1_1_BN(y)
