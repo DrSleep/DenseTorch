@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 from .miou import compute_iu, fast_cm
 
@@ -40,7 +41,8 @@ class MeanIoU:
         self.cm = np.zeros((self.num_classes, self.num_classes), dtype=int)
 
     def update(self, pred, gt):
-        idx = gt < self.num_classes
+        assert isinstance(pred, torch.Tensor), "Expected a torch.Tensor as input"
+        assert isinstance(gt, torch.Tensor), "Expected a torch.Tensor as input"
         pred_dims = len(pred.shape)
         assert (pred_dims - 1) == len(
             gt.shape
@@ -56,9 +58,12 @@ class MeanIoU:
         ), "Dimension {} of prediction tensor must be equal to the number of classes".format(
             class_axis
         )
-        pred = pred.argmax(axis=class_axis)
+        _, pred = pred.max(class_axis)
+        idx = gt < self.num_classes
         self.cm += fast_cm(
-            pred[idx].astype(np.uint8), gt[idx].astype(np.uint8), self.num_classes
+            pred[idx].cpu().numpy().astype(np.uint8),
+            gt[idx].cpu().numpy().astype(np.uint8),
+            self.num_classes,
         )
 
     def val(self):

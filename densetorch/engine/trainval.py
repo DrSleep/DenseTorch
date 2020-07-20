@@ -165,7 +165,7 @@ def validate(model, metrics, dataloader):
             input, targets = get_input_and_targets(
                 sample=sample, dataloader=dataloader, device=device
             )
-            targets = [target.squeeze(dim=1).cpu().numpy() for target in targets]
+            targets = [target.squeeze(dim=1) for target in targets]
             outputs = model(input)
             outputs = make_list(outputs)
             for out, target, metric in zip(outputs, targets, metrics):
@@ -175,10 +175,7 @@ def validate(model, metrics, dataloader):
                         size=target.shape[-2:],
                         mode="bilinear",
                         align_corners=False,
-                    )
-                    .squeeze(dim=1)
-                    .cpu()
-                    .numpy(),
+                    ).squeeze(dim=1),
                     target,
                 )
             pbar.set_description(get_val(metrics)[1])
