@@ -29,12 +29,12 @@ def num_channels():
 
 @pytest.fixture()
 def input_height():
-    return random.randint(33, 320)
+    return random.randint(33, 128)
 
 
 @pytest.fixture()
 def input_width():
-    return random.randint(33, 320)
+    return random.randint(33, 128)
 
 
 @pytest.mark.parametrize(
