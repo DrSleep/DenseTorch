@@ -12,8 +12,7 @@ Welcome to DenseTorch's documentation!
    :caption: Contents
 	
    README.md
-   SINGLETASKREADME.md
-   MULTITASKREADME.md
+   Models.md
    api
  
 
