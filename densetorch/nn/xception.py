@@ -18,7 +18,7 @@ class Xception65(nn.Module):
     More information about the model: https://arxiv.org/abs/1802.02611
 
     Args:
-      return_idx (list or int): indices of the layers to be returned
+      return_layers (list or int): indices of the layers to be returned
                                 during the forward pass.
       config (int): whether to use OS-16 or OS-8 setup.
                     OS-X means that the output will be of 1/X size of the input.
@@ -28,9 +28,9 @@ class Xception65(nn.Module):
 
     """
 
-    def __init__(self, return_idx=[20], config=16):
+    def __init__(self, return_layers=[20], config=16):
         super(Xception65, self).__init__()
-        self.return_idx = make_list(return_idx)
+        self.return_layers = make_list(return_layers)
         config = Config16 if config == 16 else Config8
         self.inplanes = 32
         self.n_layers = len(config) - 1  # for rates
@@ -45,8 +45,9 @@ class Xception65(nn.Module):
         # Xception
         for i in range(self.n_layers):
             setattr(self, "layer{}".format(i + 1), self._make_layer(config[i]))
-        self._out_c = [config[idx].filters[-1] for idx in self.return_idx]
+        self._out_c = [config[idx].filters[-1] for idx in self.return_layers]
 
+    @property
     def info(self):
         """Returns dictionary describing information required to create the decoder part."""
         return {"input_sizes": self._out_c, "rates": self.rates}
@@ -80,7 +81,7 @@ class Xception65(nn.Module):
         outs.append(self.layer19(outs[-1]))
         outs.append(self.layer20(outs[-1]))  # 1024 x / 16
         outs.append(self.layer21(outs[-1]))  # 2048 x / 32
-        return [outs[idx] for idx in self.return_idx]
+        return [outs[idx] for idx in self.return_layers]
 
     def _make_layer(self, config):
         """Create XceptionBlock layer.

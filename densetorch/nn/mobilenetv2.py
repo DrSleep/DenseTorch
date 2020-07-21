@@ -15,7 +15,7 @@ class MobileNetv2(nn.Module):
     More information about the model: https://arxiv.org/abs/1801.04381
 
     Args:
-      return_idx (list or int): indices of the layers to be returned
+      return_layers (list or int): indices of the layers to be returned
                                 during the forward pass.
 
     Attributes:
@@ -39,9 +39,9 @@ class MobileNetv2(nn.Module):
     in_planes = 32  # number of input channels
     num_layers = len(mobilenet_config)
 
-    def __init__(self, return_idx=[6]):
+    def __init__(self, return_layers=[6]):
         super(MobileNetv2, self).__init__()
-        self.return_idx = make_list(return_idx)
+        self.return_layers = make_list(return_layers)
         self.layer1 = convbnrelu(
             3, self.in_planes, kernel_size=3, stride=2, act=nn.ReLU6(inplace=True)
         )
@@ -60,8 +60,9 @@ class MobileNetv2(nn.Module):
                 self.in_planes = c
             setattr(self, "layer{}".format(c_layer), nn.Sequential(*layers))
             c_layer += 1
-        self._out_c = [self.mobilenet_config[idx][1] for idx in self.return_idx]
+        self._out_c = [self.mobilenet_config[idx][1] for idx in self.return_layers]
 
+    @property
     def info(self):
         """Returns dictionary describing information required to create the decoder part."""
         return {"input_sizes": self._out_c}
@@ -76,7 +77,7 @@ class MobileNetv2(nn.Module):
         outs.append(self.layer6(outs[-1]))  # 96, x / 16
         outs.append(self.layer7(outs[-1]))  # 160, x / 32
         outs.append(self.layer8(outs[-1]))  # 320, x / 32
-        return [outs[idx] for idx in self.return_idx]
+        return [outs[idx] for idx in self.return_layers]
 
 
 def mobilenetv2(pretrained=True, **kwargs):

@@ -30,7 +30,7 @@ def get_encoder(backbone, pretrained, return_layers):
         enc_fn = dt.nn.resnet152
     elif backbone == "mobilenetv2":
         enc_fn = dt.nn.mobilenetv2
-    return enc_fn(pretrained=pretrained, return_idx=return_layers)
+    return enc_fn(pretrained=pretrained, return_layers=return_layers)
 
 
 def get_decoder(enc_info, backbone, combine_layers, num_classes):
@@ -50,7 +50,7 @@ def get_decoder(enc_info, backbone, combine_layers, num_classes):
         dec_fn = dt.nn.MTDLv3plus
     elif backbone == "lwrefinenet":
         dec_fn = dt.nn.MTLWRefineNet
-    return dec_fn(collapse_ind=combine_layers, num_classes=num_classes, **enc_info)
+    return dec_fn(combine_layers=combine_layers, num_classes=num_classes, **enc_info)
 
 
 def get_network(
@@ -84,7 +84,7 @@ def get_network(
         return_layers=enc_return_layers,
     )
     decoder = get_decoder(
-        enc_info=encoder.info(),
+        enc_info=encoder.info,
         backbone=dec_backbone,
         combine_layers=dec_combine_layers,
         num_classes=num_classes,

@@ -234,7 +234,7 @@ class LWRefineNet(nn.Module):
 
     Args:
       input_sizes (int, or list): number of channels for each input.
-      collapse_ind (list): which input layers should be united together
+      combine_layers (list): which input layers should be united together
                            (via element-wise summation) before CRP.
       num_classes (int): number of output channels.
       agg_size (int): common filter size.
@@ -242,7 +242,7 @@ class LWRefineNet(nn.Module):
 
     """
 
-    def __init__(self, input_sizes, collapse_ind, num_classes, agg_size=256, n_crp=4):
+    def __init__(self, input_sizes, combine_layers, num_classes, agg_size=256, n_crp=4):
         super(LWRefineNet, self).__init__()
 
         stem_convs = nn.ModuleList()
@@ -253,12 +253,12 @@ class LWRefineNet(nn.Module):
         # Reverse since we recover information from the end
         input_sizes = list(reversed(input_sizes))
         # No reverse for collapse indices
-        self.collapse_ind = make_list(collapse_ind)
+        self.combine_layers = make_list(combine_layers)
 
         for size in input_sizes:
             stem_convs.append(conv1x1(size, agg_size, bias=False))
 
-        for _ in range(len(self.collapse_ind)):
+        for _ in range(len(self.combine_layers)):
             crp_blocks.append(self._make_crp(agg_size, agg_size, n_crp))
             adapt_convs.append(conv1x1(agg_size, agg_size, bias=False))
 
@@ -276,7 +276,7 @@ class LWRefineNet(nn.Module):
             xs[idx] = conv(x)
         # Collapse layers
         c_xs = [
-            sum([xs[idx] for idx in make_list(c_idx)]) for c_idx in self.collapse_ind
+            sum([xs[idx] for idx in make_list(c_idx)]) for c_idx in self.combine_layers
         ]
 
         for idx, (crp, x) in enumerate(zip(self.crp_blocks, c_xs)):
@@ -321,7 +321,7 @@ class MTLWRefineNet(nn.Module):
 
     Args:
       input_sizes (int, or list): number of channels for each input.
-      collapse_ind (list): which input layers should be united together
+      combine_layers (list): which input layers should be united together
                            (via element-wise summation) before CRP.
       num_classes (int or list): number of output channels per each head.
       agg_size (int): common filter size.
@@ -330,7 +330,7 @@ class MTLWRefineNet(nn.Module):
     """
 
     def __init__(
-        self, input_sizes, collapse_ind, num_classes, agg_size=256, n_crp=4, **kwargs
+        self, input_sizes, combine_layers, num_classes, agg_size=256, n_crp=4, **kwargs
     ):
         super(MTLWRefineNet, self).__init__()
 
@@ -343,8 +343,8 @@ class MTLWRefineNet(nn.Module):
         # Reverse since we recover information from the end
         input_sizes = list(reversed(input_sizes))
         # No reverse for collapse indices is needed
-        self.collapse_ind = make_list(collapse_ind)
-        groups = [False] * len(self.collapse_ind)
+        self.combine_layers = make_list(combine_layers)
+        groups = [False] * len(self.combine_layers)
         groups[-1] = True
 
         for size in input_sizes:
@@ -378,7 +378,7 @@ class MTLWRefineNet(nn.Module):
             xs[idx] = conv(x)
         # Collapse layers
         c_xs = [
-            sum([xs[idx] for idx in make_list(c_idx)]) for c_idx in self.collapse_ind
+            sum([xs[idx] for idx in make_list(c_idx)]) for c_idx in self.combine_layers
         ]
 
         for idx, (crp, x) in enumerate(zip(self.crp_blocks, c_xs)):

@@ -16,7 +16,7 @@ class ResNet(nn.Module):
     Args:
         block (nn.Module): type of building block (Basic or Bottleneck).
         layers (list of ints): number of blocks in each layer.
-        return_idx (list or int): indices of the layers to be returned
+        return_layers (list or int): indices of the layers to be returned
                                   during the forward pass.
 
     Attributes:
@@ -24,11 +24,11 @@ class ResNet(nn.Module):
 
     """
 
-    def __init__(self, block, layers, return_idx=[0, 1, 2, 3]):
+    def __init__(self, block, layers, return_layers=[0, 1, 2, 3]):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self._out_c = []
-        self.return_idx = make_list(return_idx)
+        self.return_layers = make_list(return_layers)
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=0.95)
         self.relu = nn.ReLU(inplace=True)
@@ -38,9 +38,10 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self._out_c = [
-            out_c for idx, out_c in enumerate(self._out_c) if idx in self.return_idx
+            out_c for idx, out_c in enumerate(self._out_c) if idx in self.return_layers
         ]
 
+    @property
     def info(self):
         """Returns dictionary describing information required to create the decoder part."""
         return {"input_sizes": self._out_c}
@@ -89,7 +90,7 @@ class ResNet(nn.Module):
         outs.append(self.layer2(outs[-1]))  # 1/8
         outs.append(self.layer3(outs[-1]))  # 1/16
         outs.append(self.layer4(outs[-1]))  # 1/32
-        return [outs[idx] for idx in self.return_idx]
+        return [outs[idx] for idx in self.return_layers]
 
 
 def resnet18(pretrained=False, **kwargs):
