@@ -55,7 +55,7 @@ def input_width():
 )
 def test_encoders(enc_fn, input_height, input_width):
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    encoder = enc_fn(pretrained=False, return_idx=0).to(device)
+    encoder = enc_fn(pretrained=False, return_layers=0).to(device)
     with torch.no_grad():
         input_tensor = get_dummy_input_tensor(
             height=input_height, width=input_width
@@ -74,7 +74,7 @@ def test_encoders(enc_fn, input_height, input_width):
 def test_decoders(dec_fn, input_height, input_width, num_classes, num_channels):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     decoder = dec_fn(
-        input_sizes=num_channels, num_classes=num_classes, collapse_ind=0
+        input_sizes=num_channels, num_classes=num_classes, combine_layers=0
     ).to(device)
     with torch.no_grad():
         input_tensor = get_dummy_input_tensor(
