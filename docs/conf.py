@@ -31,6 +31,7 @@ author = 'Vladimir Nekrasov'
 extensions = [
     "recommonmark",
     "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
